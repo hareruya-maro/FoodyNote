@@ -1,34 +1,47 @@
 import { Slot, useRouter, useSegments } from 'expo-router';
-import { useEffect } from 'react';
-import { SessionProvider, useSession } from '../ctx';
+import { useEffect, useState } from 'react';
+import { useAtomValue } from 'jotai';
+import { userAtom } from '../store/userAtom';
 import '../global.css';
 
 function RootLayoutNav() {
-  const { session, isLoading } = useSession();
+  const session = useAtomValue(userAtom);
   const segments = useSegments();
   const router = useRouter();
 
-  useEffect(() => {
-    if (isLoading) return;
+  const [isMounted, setIsMounted] = useState(false);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
+    // Build-in a small delay or just rely on isMounted to ensure RootLayout is ready
     const inAuthGroup = segments[0] === '(auth)';
 
     if (!session && !inAuthGroup) {
-      // Redirect to the sign-in page.
       router.replace('/(auth)/login');
     } else if (session && inAuthGroup) {
-      // Redirect away from the sign-in page.
       router.replace('/(app)/(tabs)');
     }
-  }, [session, segments, isLoading]);
+  }, [session, segments, isMounted]);
 
   return <Slot />;
 }
 
+import { Suspense } from 'react';
+import { ActivityIndicator, View } from 'react-native';
+
 export default function RootLayout() {
   return (
-    <SessionProvider>
+    <Suspense fallback={
+      <View className="flex-1 items-center justify-center bg-white">
+        <ActivityIndicator size="large" color="#009688" />
+      </View>
+    }>
       <RootLayoutNav />
-    </SessionProvider>
+    </Suspense>
   );
 }

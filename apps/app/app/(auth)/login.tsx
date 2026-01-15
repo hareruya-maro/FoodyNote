@@ -1,16 +1,19 @@
 import { View, Text, TouchableOpacity } from 'react-native';
-import { useSession } from '../../ctx';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSetAtom } from 'jotai';
+import { userAtom } from '../../store/userAtom';
 
 export default function Login() {
-    const { signIn } = useSession();
+    const setUser = useSetAtom(userAtom);
     const router = useRouter();
 
     const handlePress = () => {
-        signIn();
-        // Navigate after sign in
-        router.replace('/');
+        // Set mock user session
+        setUser({ uid: 'mock-user-123', email: 'test@example.com', name: 'Test User' });
+        // Navigation is handled by RootLayout based on user state change, 
+        // but we can also force it or let the effect take over. 
+        // Usually setting the atom triggers the effect in _layout.
     };
 
     return (
