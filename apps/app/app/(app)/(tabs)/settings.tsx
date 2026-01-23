@@ -1,17 +1,26 @@
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Stethoscope, LogOut, ChevronRight, User } from 'lucide-react-native';
+import { Stethoscope, LogOut, ChevronRight, User, Globe, Check } from 'lucide-react-native';
 import { useSession } from '../../../ctx';
+import { useTranslation } from 'react-i18next';
+import { changeLanguage } from '../../../i18n';
 
 export default function SettingsScreen() {
     const router = useRouter();
     const { signOut } = useSession();
+    const { t, i18n } = useTranslation();
+
+    const currentLanguage = i18n.language;
+
+    const handleLanguageChange = (lang: string) => {
+        changeLanguage(lang);
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
             <View className="px-6 py-4 bg-white border-b border-gray-100">
-                <Text className="text-2xl font-bold text-gray-800">Settings</Text>
+                <Text className="text-2xl font-bold text-gray-800">{t('settings.title')}</Text>
             </View>
 
             <ScrollView className="flex-1 p-6">
@@ -25,23 +34,43 @@ export default function SettingsScreen() {
                         <Stethoscope color="white" size={32} />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-white text-lg font-bold">Doctor Presentation Mode</Text>
-                        <Text className="text-teal-100 text-sm mt-1">Show checking summary for medical consultation.</Text>
+                        <Text className="text-white text-lg font-bold">{t('settings.doctorMode.title')}</Text>
+                        <Text className="text-teal-100 text-sm mt-1">{t('settings.doctorMode.description')}</Text>
                     </View>
                     <ChevronRight color="white" size={24} />
                 </TouchableOpacity>
 
-                <Text className="text-gray-500 font-bold mb-4 uppercase text-xs tracking-wider">Account</Text>
+                <Text className="text-gray-500 font-bold mb-4 uppercase text-xs tracking-wider">{t('settings.preferences')}</Text>
+                <View className="bg-white rounded-xl shadow-sm mb-6 overflow-hidden">
+                    <TouchableOpacity
+                        className="p-4 border-b border-gray-100 flex-row items-center"
+                        onPress={() => handleLanguageChange('en')}
+                    >
+                        <Globe size={20} color="#4b5563" />
+                        <Text className="text-gray-700 ml-3 text-base flex-1">English</Text>
+                        {currentLanguage === 'en' && <Check size={20} color="#009688" />}
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        className="p-4 flex-row items-center"
+                        onPress={() => handleLanguageChange('ja')}
+                    >
+                        <Globe size={20} color="#4b5563" />
+                        <Text className="text-gray-700 ml-3 text-base flex-1">日本語</Text>
+                        {currentLanguage === 'ja' && <Check size={20} color="#009688" />}
+                    </TouchableOpacity>
+                </View>
+
+                <Text className="text-gray-500 font-bold mb-4 uppercase text-xs tracking-wider">{t('settings.account')}</Text>
 
                 <View className="bg-white rounded-xl shadow-sm mb-6 overflow-hidden">
                     <TouchableOpacity className="p-4 border-b border-gray-100 flex-row items-center">
                         <User size={20} color="#4b5563" />
-                        <Text className="text-gray-700 ml-3 text-base flex-1">Profile</Text>
+                        <Text className="text-gray-700 ml-3 text-base flex-1">{t('settings.profile')}</Text>
                         <ChevronRight size={20} color="#9ca3af" />
                     </TouchableOpacity>
                     <TouchableOpacity className="p-4 flex-row items-center" onPress={signOut}>
                         <LogOut size={20} color="#ef4444" />
-                        <Text className="text-red-500 ml-3 text-base flex-1">Sign Out</Text>
+                        <Text className="text-red-500 ml-3 text-base flex-1">{t('settings.signOut')}</Text>
                     </TouchableOpacity>
                 </View>
 

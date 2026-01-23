@@ -7,6 +7,7 @@ import { useMeals } from '../../../hooks/useMeals';
 import { useSymptoms } from '../../../hooks/useSymptoms';
 import { MealRecord, SymptomRecord } from '../../../types';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 type TimelineItem = {
   type: 'meal' | 'symptom';
@@ -18,6 +19,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const { data: meals, isLoading: mealsLoading } = useMeals();
   const { data: symptoms, isLoading: symptomsLoading } = useSymptoms();
+  const { t } = useTranslation();
 
   const timelineData = useMemo(() => {
     if (!meals || !symptoms) return [];
@@ -68,9 +70,9 @@ export default function HomeScreen() {
                   {(item.data as SymptomRecord).type === 'bloated' && <Meh size={20} color="#ca8a04" />}
                   {(item.data as SymptomRecord).type === 'nausea' && <AlertCircle size={20} color="#3b82f6" />}
 
-                  <Text className="text-lg font-bold text-gray-800 ml-2 capitalize">{(item.data as SymptomRecord).type}</Text>
+                  <Text className="text-lg font-bold text-gray-800 ml-2 capitalize">{t(`symptoms.types.${(item.data as SymptomRecord).type}`, { defaultValue: (item.data as SymptomRecord).type })}</Text>
                   <View className="ml-2 bg-white/50 px-2 py-0.5 rounded-full border border-gray-200">
-                    <Text className="text-xs font-bold text-gray-600 capitalize">{(item.data as SymptomRecord).severity}</Text>
+                    <Text className="text-xs font-bold text-gray-600 capitalize">{t(`symptoms.severities.${(item.data as SymptomRecord).severity}`, { defaultValue: (item.data as SymptomRecord).severity })}</Text>
                   </View>
                 </View>
                 {(item.data as SymptomRecord).note ? (
@@ -105,8 +107,8 @@ export default function HomeScreen() {
         contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
         ListEmptyComponent={
           <View className="items-center justify-center py-20">
-            <Text className="text-gray-400">No records yet.</Text>
-            <Text className="text-gray-400 text-xs mt-1">Add your first meal or symptom!</Text>
+            <Text className="text-gray-400">{t('home.noRecords')}</Text>
+            <Text className="text-gray-400 text-xs mt-1">{t('home.addFirst')}</Text>
           </View>
         }
       />
@@ -117,7 +119,7 @@ export default function HomeScreen() {
           className="flex-row items-center bg-accent px-5 py-3 rounded-full shadow-lg active:scale-95 transition-transform"
         >
           <Activity color="white" size={20} />
-          <Text className="text-white font-bold ml-2">Symptom</Text>
+          <Text className="text-white font-bold ml-2">{t('home.buttons.symptom')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -125,9 +127,10 @@ export default function HomeScreen() {
           className="flex-row items-center bg-primary px-5 py-3 rounded-full shadow-lg active:scale-95 transition-transform"
         >
           <Camera color="white" size={20} />
-          <Text className="text-white font-bold ml-2">Meal</Text>
+          <Text className="text-white font-bold ml-2">{t('home.buttons.meal')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
+

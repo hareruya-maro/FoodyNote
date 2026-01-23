@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMeals } from '../../../hooks/useMeals';
 import { useSymptoms } from '../../../hooks/useSymptoms';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // Configuration
 const ANALYSIS_WINDOW_HOURS = 12;
@@ -16,6 +17,7 @@ type TriggerCandidate = {
 export default function AnalysisScreen() {
     const { data: meals, isLoading: mealsLoading } = useMeals();
     const { data: symptoms, isLoading: symptomsLoading } = useSymptoms();
+    const { t } = useTranslation();
 
     const candidates = useMemo(() => {
         if (!meals || !symptoms) return [];
@@ -65,26 +67,26 @@ export default function AnalysisScreen() {
     return (
         <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
             <View className="px-6 py-4 bg-white border-b border-gray-100">
-                <Text className="text-2xl font-bold text-gray-800">Analysis</Text>
+                <Text className="text-2xl font-bold text-gray-800">{t('analysis.title')}</Text>
             </View>
 
             <ScrollView className="flex-1 p-6">
                 {topCandidate ? (
                     <View className="bg-teal-700 rounded-3xl p-6 mb-8 shadow-lg">
-                        <Text className="text-teal-100 font-medium mb-1">Potential Trigger Found</Text>
+                        <Text className="text-teal-100 font-medium mb-1">{t('analysis.triggerFound')}</Text>
                         <Text className="text-white text-3xl font-bold mb-4">{topCandidate.name}</Text>
                         <Text className="text-teal-50 leading-5">
-                            Your data suggests that "{topCandidate.name}" appears frequently before your symptoms. It was found in {topCandidate.count} meals prior to episodes.
+                            {t('analysis.insight', { name: topCandidate.name, count: topCandidate.count })}
                         </Text>
                     </View>
                 ) : (
                     <View className="bg-gray-200 rounded-3xl p-6 mb-8 items-center justify-center">
-                        <Text className="text-gray-500 font-medium text-center">Not enough data yet.</Text>
-                        <Text className="text-gray-400 text-sm mt-2 text-center">Keep recording meals and symptoms to find patterns.</Text>
+                        <Text className="text-gray-500 font-medium text-center">{t('analysis.noData.title')}</Text>
+                        <Text className="text-gray-400 text-sm mt-2 text-center">{t('analysis.noData.description')}</Text>
                     </View>
                 )}
 
-                <Text className="text-lg font-bold text-gray-800 mb-4">Top Trigger Candidates</Text>
+                <Text className="text-lg font-bold text-gray-800 mb-4">{t('analysis.topCandidates')}</Text>
 
                 {candidates.map((item, i) => (
                     <View key={i} className="bg-white p-5 rounded-2xl mb-3 flex-row items-center border border-gray-100">
@@ -93,17 +95,17 @@ export default function AnalysisScreen() {
                         </View>
                         <View className="flex-1">
                             <Text className="text-lg font-bold text-gray-800">{item.name}</Text>
-                            <Text className="text-gray-500 text-sm">Associated with {item.count} episodes</Text>
+                            <Text className="text-gray-500 text-sm">{t('analysis.associatedEpisodes', { count: item.count })}</Text>
                         </View>
                         <View className="items-end">
                             <Text className="text-lg font-bold text-accent">{item.score}%</Text>
-                            <Text className="text-xs text-gray-400">freq.</Text>
+                            <Text className="text-xs text-gray-400">{t('analysis.freq')}</Text>
                         </View>
                     </View>
                 ))}
 
                 {candidates.length === 0 && (
-                    <Text className="text-gray-400 text-center mt-10">No patterns detected yet.</Text>
+                    <Text className="text-gray-400 text-center mt-10">{t('analysis.noPatterns')}</Text>
                 )}
 
             </ScrollView>

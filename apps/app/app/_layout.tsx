@@ -1,4 +1,5 @@
 import { Slot, useRouter, useSegments } from 'expo-router';
+import '../i18n';
 import { useEffect, useState } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import { userAtom, authInitializedAtom } from '../store/userAtom';
