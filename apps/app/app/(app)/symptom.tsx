@@ -1,26 +1,32 @@
-import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Frown, Meh, AlertCircle, Save } from 'lucide-react-native';
 import { useState } from 'react';
-import { useSetAtom } from 'jotai';
-import { addSymptomAtom } from '../../store/symptomsAtom';
+import { useAddSymptom } from '../../hooks/useSymptoms';
 import { SymptomType, SeverityLevel } from '../../types';
 
 export default function SymptomScreen() {
   const router = useRouter();
-  const addSymptom = useSetAtom(addSymptomAtom);
+  const addSymptom = useAddSymptom();
 
   const [type, setType] = useState<SymptomType>('bloated');
   const [severity, setSeverity] = useState<SeverityLevel>('medium');
   const [note, setNote] = useState('');
 
   const handleSave = () => {
-    addSymptom({
+    addSymptom.mutate({
       type,
       severity,
       note
+    }, {
+      onSuccess: () => {
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.replace('/');
+        }
+      }
     });
-    router.back();
   };
 
   return (
@@ -77,12 +83,17 @@ export default function SymptomScreen() {
 
         <TouchableOpacity
           onPress={handleSave}
-          className="w-full bg-accent py-4 rounded-xl items-center shadow-lg active:scale-95 transition-transform"
+          disabled={addSymptom.isPending}
+          className={`w-full bg-accent py-4 rounded-xl items-center shadow-lg active:scale-95 transition-transform ${addSymptom.isPending ? 'opacity-70' : ''}`}
         >
-          <View className="flex-row items-center">
-            <Save size={20} color="white" />
-            <Text className="text-white font-bold text-lg ml-2">Save Symptom</Text>
-          </View>
+          {addSymptom.isPending ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <View className="flex-row items-center">
+              <Save size={20} color="white" />
+              <Text className="text-white font-bold text-lg ml-2">Save Symptom</Text>
+            </View>
+          )}
         </TouchableOpacity>
 
       </ScrollView>

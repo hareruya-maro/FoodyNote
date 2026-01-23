@@ -1,24 +1,34 @@
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { useAtomValue } from 'jotai';
-import { userAtom } from '../store/userAtom';
+import { useAtom, useSetAtom } from 'jotai';
+import { userAtom, authInitializedAtom } from '../store/userAtom';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ActivityIndicator, View } from 'react-native';
 import '../global.css';
 
+const queryClient = new QueryClient();
+
 function RootLayoutNav() {
-  const session = useAtomValue(userAtom);
+  const [session, setSession] = useAtom(userAtom);
+  const [initialized, setInitialized] = useAtom(authInitializedAtom);
   const segments = useSegments();
   const router = useRouter();
-
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setSession(user);
+      setInitialized(true);
+    });
+    return unsubscribe;
   }, []);
 
   useEffect(() => {
-    if (!isMounted) return;
+    if (!initialized || !isMounted) return;
 
-    // Build-in a small delay or just rely on isMounted to ensure RootLayout is ready
     const inAuthGroup = segments[0] === '(auth)';
 
     if (!session && !inAuthGroup) {
@@ -26,22 +36,23 @@ function RootLayoutNav() {
     } else if (session && inAuthGroup) {
       router.replace('/(app)/(tabs)');
     }
-  }, [session, segments, isMounted]);
+  }, [session, segments, initialized, isMounted]);
+
+  if (!initialized) {
+    return (
+      <View className="flex-1 items-center justify-center bg-white">
+        <ActivityIndicator size="large" color="#009688" />
+      </View>
+    );
+  }
 
   return <Slot />;
 }
 
-import { Suspense } from 'react';
-import { ActivityIndicator, View } from 'react-native';
-
 export default function RootLayout() {
   return (
-    <Suspense fallback={
-      <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#009688" />
-      </View>
-    }>
+    <QueryClientProvider client={queryClient}>
       <RootLayoutNav />
-    </Suspense>
+    </QueryClientProvider>
   );
 }

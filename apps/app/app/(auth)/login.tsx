@@ -1,25 +1,26 @@
-import { View, Text, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useSetAtom } from 'jotai';
-import { userAtom } from '../../store/userAtom';
+import { signInAnonymously } from 'firebase/auth';
+import { auth } from '../../firebaseConfig';
+import { useState } from 'react';
 
 export default function Login() {
-    const setUser = useSetAtom(userAtom);
-    const router = useRouter();
+    const [loading, setLoading] = useState(false);
 
-    const handlePress = () => {
-        // Set mock user session
-        setUser({ uid: 'mock-user-123', email: 'test@example.com', name: 'Test User' });
-        // Navigation is handled by RootLayout based on user state change, 
-        // but we can also force it or let the effect take over. 
-        // Usually setting the atom triggers the effect in _layout.
+    const handlePress = async () => {
+        setLoading(true);
+        try {
+            await signInAnonymously(auth);
+            // Navigation handled by RootLayout onAuthStateChanged
+        } catch (error) {
+            console.error(error);
+            setLoading(false);
+        }
     };
 
     return (
         <SafeAreaView className="flex-1 bg-white items-center justify-center p-6">
             <View className="items-center mb-12">
-                {/* Logo placeholder */}
                 <View className="w-24 h-24 bg-primary rounded-3xl items-center justify-center mb-6 shadow-md transform rotate-3">
                     <Text className="text-white text-5xl font-bold">Fn</Text>
                 </View>
@@ -31,9 +32,14 @@ export default function Login() {
 
             <TouchableOpacity
                 onPress={handlePress}
+                disabled={loading}
                 className="w-full bg-primary py-4 rounded-2xl items-center shadow-lg active:scale-95 transition-transform"
             >
-                <Text className="text-white font-bold text-lg">Agree & Start</Text>
+                {loading ? (
+                    <ActivityIndicator color="white" />
+                ) : (
+                    <Text className="text-white font-bold text-lg">Agree & Start</Text>
+                )}
             </TouchableOpacity>
 
             <Text className="text-xs text-gray-400 mt-8 text-center px-8 leading-4">

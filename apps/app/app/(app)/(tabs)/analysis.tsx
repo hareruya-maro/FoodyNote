@@ -1,9 +1,8 @@
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAtomValue } from 'jotai';
+import { useMeals } from '../../../hooks/useMeals';
+import { useSymptoms } from '../../../hooks/useSymptoms';
 import { useMemo } from 'react';
-import { sortedMealsAtom } from '@/store/mealsAtom';
-import { sortedSymptomsAtom } from '@/store/symptomsAtom';
 
 // Configuration
 const ANALYSIS_WINDOW_HOURS = 12;
@@ -11,14 +10,16 @@ const ANALYSIS_WINDOW_HOURS = 12;
 type TriggerCandidate = {
     name: string;
     count: number;
-    score: number; // Simple probability score (0-100)
+    score: number;
 };
 
 export default function AnalysisScreen() {
-    const meals = useAtomValue(sortedMealsAtom);
-    const symptoms = useAtomValue(sortedSymptomsAtom);
+    const { data: meals, isLoading: mealsLoading } = useMeals();
+    const { data: symptoms, isLoading: symptomsLoading } = useSymptoms();
 
     const candidates = useMemo(() => {
+        if (!meals || !symptoms) return [];
+
         const tagCounts: Record<string, number> = {};
         let totalSymptomsAnalyzed = 0;
 
@@ -27,13 +28,11 @@ export default function AnalysisScreen() {
             const symptomTime = new Date(symptom.timestamp).getTime();
             const windowStart = symptomTime - (ANALYSIS_WINDOW_HOURS * 60 * 60 * 1000);
 
-            // Find meals within X hours BEFORE symptom
             const relevantMeals = meals.filter(m => {
                 const mealTime = new Date(m.timestamp).getTime();
                 return mealTime >= windowStart && mealTime < symptomTime;
             });
 
-            // Count tags
             relevantMeals.forEach(meal => {
                 meal.tags.forEach(tag => {
                     tagCounts[tag] = (tagCounts[tag] || 0) + 1;
@@ -41,11 +40,7 @@ export default function AnalysisScreen() {
             });
         });
 
-        // Convert to array
         const results: TriggerCandidate[] = Object.entries(tagCounts).map(([name, count]) => {
-            // Simple heuristic: Score = (Count / TotalSymptoms) * 100
-            // If a tag appears before every symptom, it's 100%.
-            // We adjust slightly to avoid overconfidence on single occurance.
             const rawScore = totalSymptomsAnalyzed > 0 ? (count / totalSymptomsAnalyzed) * 100 : 0;
             return {
                 name,
@@ -54,10 +49,18 @@ export default function AnalysisScreen() {
             };
         });
 
-        return results.sort((a, b) => b.score - a.score).slice(0, 5); // Top 5
+        return results.sort((a, b) => b.score - a.score).slice(0, 5);
     }, [meals, symptoms]);
 
     const topCandidate = candidates.length > 0 ? candidates[0] : null;
+
+    if (mealsLoading || symptomsLoading) {
+        return (
+            <View className="flex-1 items-center justify-center bg-gray-50">
+                <ActivityIndicator size="small" color="#009688" />
+            </View>
+        );
+    }
 
     return (
         <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>

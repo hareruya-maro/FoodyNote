@@ -1,27 +1,32 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { X } from 'lucide-react-native';
-import { sortedMealsAtom } from '../../store/mealsAtom';
-import { sortedSymptomsAtom } from '../../store/symptomsAtom';
+import { useSymptoms } from '../../hooks/useSymptoms';
 import { useMemo } from 'react';
 import { format } from 'date-fns';
-import { useAtomValue } from 'jotai';
 
 export default function DoctorScreen() {
     const router = useRouter();
-    const symptoms = useAtomValue(sortedSymptomsAtom);
-    const meals = useAtomValue(sortedMealsAtom); // Needed for correlation potentially
+    const { data: symptoms, isLoading } = useSymptoms();
 
     const stats = useMemo(() => {
-        // Mock stats for now, but using real count
+        if (!symptoms) return { totalSymptoms: 0, avgLagTime: '--' };
         return {
             totalSymptoms: symptoms.length,
-            avgLagTime: '2.5h', // Placeholder until we link specific meals to symptoms
+            avgLagTime: '2.5h', // Placeholder 
         };
     }, [symptoms]);
 
-    const recentEpisodes = useMemo(() => symptoms.slice(0, 5), [symptoms]);
+    const recentEpisodes = useMemo(() => symptoms ? symptoms.slice(0, 5) : [], [symptoms]);
+
+    if (isLoading) {
+        return (
+            <View className="flex-1 items-center justify-center bg-white">
+                <ActivityIndicator size="small" color="#009688" />
+            </View>
+        );
+    }
 
     return (
         <View className="flex-1 bg-white">
@@ -32,7 +37,13 @@ export default function DoctorScreen() {
                         <Text className="text-2xl font-bold text-gray-800">Review Summary</Text>
                     </View>
                     <TouchableOpacity
-                        onPress={() => router.back()}
+                        onPress={() => {
+                            if (router.canGoBack()) {
+                                router.back();
+                            } else {
+                                router.replace('/');
+                            }
+                        }}
                         className="w-10 h-10 bg-gray-200 rounded-full items-center justify-center"
                     >
                         <X color="#374151" size={24} />
@@ -53,7 +64,6 @@ export default function DoctorScreen() {
                         </View>
                     </View>
 
-                    {/* Mock Correlation Table for now - logic similar to Analysis Screen would be good here too */}
                     <Text className="text-lg font-bold text-gray-800 mb-4">Correlated Ingredients (Analysis View)</Text>
                     <View className="bg-blue-50 p-4 rounded-xl mb-8">
                         <Text className="text-blue-800">Please refer to the "Analysis" tab for the detailed trigger ranking algorithm results.</Text>

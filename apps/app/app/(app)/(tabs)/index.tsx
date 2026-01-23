@@ -1,13 +1,12 @@
-import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Camera, Activity, AlertCircle, Meh, Frown } from 'lucide-react-native';
+import { Camera, Activity, Frown, Meh, AlertCircle } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
-import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
+import { useMeals } from '../../../hooks/useMeals';
+import { useSymptoms } from '../../../hooks/useSymptoms';
+import { MealRecord, SymptomRecord } from '../../../types';
 import { format } from 'date-fns';
-import { MealRecord, SymptomRecord } from '@/types';
-import { sortedMealsAtom } from '@/store/mealsAtom';
-import { sortedSymptomsAtom } from '@/store/symptomsAtom';
 
 type TimelineItem = {
   type: 'meal' | 'symptom';
@@ -17,10 +16,13 @@ type TimelineItem = {
 
 export default function HomeScreen() {
   const router = useRouter();
-  const meals = useAtomValue(sortedMealsAtom);
-  const symptoms = useAtomValue(sortedSymptomsAtom);
+  const { data: meals, isLoading: mealsLoading } = useMeals();
+  const { data: symptoms, isLoading: symptomsLoading } = useSymptoms();
 
   const timelineData = useMemo(() => {
+    if (!meals || !symptoms) return [];
+
+    // Sort logic handled in hook query usually, but re-sort for combined list
     const combined: TimelineItem[] = [
       ...meals.map(m => ({ type: 'meal' as const, data: m, timestamp: m.timestamp })),
       ...symptoms.map(s => ({ type: 'symptom' as const, data: s, timestamp: s.timestamp })),
@@ -62,7 +64,6 @@ export default function HomeScreen() {
               // Symptom Item
               <View>
                 <View className="flex-row items-center mb-1">
-                  {/* Icon based on type */}
                   {(item.data as SymptomRecord).type === 'pain' && <Frown size={20} color="#ef4444" />}
                   {(item.data as SymptomRecord).type === 'bloated' && <Meh size={20} color="#ca8a04" />}
                   {(item.data as SymptomRecord).type === 'nausea' && <AlertCircle size={20} color="#3b82f6" />}
@@ -72,9 +73,9 @@ export default function HomeScreen() {
                     <Text className="text-xs font-bold text-gray-600 capitalize">{(item.data as SymptomRecord).severity}</Text>
                   </View>
                 </View>
-                {(item.data as SymptomRecord).note && (
+                {(item.data as SymptomRecord).note ? (
                   <Text className="text-gray-600 mt-1">{(item.data as SymptomRecord).note}</Text>
-                )}
+                ) : null}
               </View>
             )}
           </View>
@@ -82,6 +83,14 @@ export default function HomeScreen() {
       </View>
     );
   };
+
+  if (mealsLoading || symptomsLoading) {
+    return (
+      <View className="flex-1 items-center justify-center bg-gray-50">
+        <ActivityIndicator size="large" color="#009688" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
@@ -92,7 +101,7 @@ export default function HomeScreen() {
       <FlatList
         data={timelineData}
         renderItem={renderItem}
-        keyExtractor={(item, index) => item.type + item.timestamp + index} // simple unique key mock
+        keyExtractor={(item, index) => item.type + item.timestamp + index}
         contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
         ListEmptyComponent={
           <View className="items-center justify-center py-20">
@@ -102,7 +111,6 @@ export default function HomeScreen() {
         }
       />
 
-      {/* Double FAB */}
       <View className="absolute bottom-6 right-6 items-end gap-y-3 z-50">
         <TouchableOpacity
           onPress={() => router.push('/symptom')}
