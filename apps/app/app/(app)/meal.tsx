@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 export default function MealScreen() {
     const router = useRouter();
     const addMeal = useAddMeal();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const [photoUri, setPhotoUri] = useState<string | null>(null);
     const [photoBase64, setPhotoBase64] = useState<string | null>(null);
@@ -49,7 +49,8 @@ export default function MealScreen() {
             const response = await analyzeFn({
                 imageBase64: photoBase64,
                 mimeType: 'image/jpeg',
-                dishName: dishName // Pass user input as hint
+                dishName: dishName, // Pass user input as hint
+                language: i18n.language
             });
 
             const data = response.data as { dishName: string, ingredients: string[] };

@@ -9,10 +9,10 @@ const client = new GoogleGenAI({
 
 const model = 'gemini-3-flash-preview';
 
-export async function generateContent(imageBase64: string, mimeType: string = 'image/jpeg', dishNameHint?: string) {
+export async function generateContent(imageBase64: string, mimeType: string = 'image/jpeg', dishNameHint?: string, language: string = 'en') {
     const promptText = dishNameHint
-        ? `Analyze this image and identify the dish name and list its ingredients. The user identified this dish as '${dishNameHint}'. Use this as a strong hint. Focus on high-FODMAP ingredients, allergens, and common trigger foods.`
-        : 'Analyze this image and identify the dish name and list its ingredients. Focus on high-FODMAP ingredients, allergens, and common trigger foods.';
+        ? `Analyze this image and identify the dish name and list its ingredients. The user identified this dish as '${dishNameHint}'. Use this as a strong hint. Focus on high-FODMAP ingredients, allergens, and common trigger foods. Respond in ${language}.`
+        : `Analyze this image and identify the dish name and list its ingredients. Focus on high-FODMAP ingredients, allergens, and common trigger foods. Respond in ${language}.`;
 
     const response = await client.models.generateContent({
         model: model,

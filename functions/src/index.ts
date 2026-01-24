@@ -13,7 +13,7 @@ export const analyzeMealImage = onCall({ region: "us-central1" }, async (request
         );
     }
 
-    const { imageBase64, mimeType, dishName } = request.data;
+    const { imageBase64, mimeType, dishName, language } = request.data;
 
     if (!imageBase64) {
         throw new HttpsError(
@@ -23,7 +23,7 @@ export const analyzeMealImage = onCall({ region: "us-central1" }, async (request
     }
 
     try {
-        const result = await generateContent(imageBase64, mimeType, dishName);
+        const result = await generateContent(imageBase64, mimeType, dishName, language);
         return result;
     } catch (error) {
         console.error("Error calling Gemini:", error);
