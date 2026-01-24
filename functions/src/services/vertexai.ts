@@ -1,10 +1,10 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 
 // Initialize Gen AI Client with Vertex AI backend
 const client = new GoogleGenAI({
     vertexai: true,
     project: process.env.GCLOUD_PROJECT || 'food-note', // Fallback to project ID if env not set
-    location: 'us-central1'
+    location: 'global'
 });
 
 const model = 'gemini-3-flash-preview';
@@ -41,6 +41,9 @@ export async function generateContent(imageBase64: string, mimeType: string = 'i
                     }
                 },
                 required: ["dishName", "ingredients"],
+            },
+            thinkingConfig: {
+                thinkingLevel: ThinkingLevel.LOW,
             }
         }
     });

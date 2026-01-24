@@ -36,7 +36,7 @@ if (Platform.OS !== 'web') {
 }
 
 const db = getFirestore(app);
-const functions = getFunctions(app);
+const functions = getFunctions(app, "us-central1");
 const storage = getStorage(app);
 
 // Connect to Emulators in Dev

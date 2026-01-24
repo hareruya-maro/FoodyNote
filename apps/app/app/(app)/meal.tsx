@@ -5,7 +5,6 @@ import { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebaseConfig';
-import { File } from 'expo-file-system';
 import { useAddMeal } from '../../hooks/useMeals';
 import { useTranslation } from 'react-i18next';
 
@@ -15,6 +14,7 @@ export default function MealScreen() {
     const { t } = useTranslation();
 
     const [photoUri, setPhotoUri] = useState<string | null>(null);
+    const [photoBase64, setPhotoBase64] = useState<string | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [tags, setTags] = useState<string[]>([]);
     const [dishName, setDishName] = useState('');
@@ -22,14 +22,16 @@ export default function MealScreen() {
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: "images",
             allowsEditing: true,
             aspect: [4, 3],
             quality: 0.5, // Reduce quality for faster upload/base64
+            base64: true,
         });
 
         if (!result.canceled) {
             setPhotoUri(result.assets[0].uri);
+            setPhotoBase64(result.assets[0].base64 || null);
             setAnalysisDone(false);
             setTags([]);
             // Do not start analysis automatically
@@ -37,16 +39,15 @@ export default function MealScreen() {
     };
 
     const startAnalysis = async () => {
-        if (!photoUri) return;
+        if (!photoUri || !photoBase64) return;
 
         setIsAnalyzing(true);
         setTags([]);
         try {
-            const base64 = await new File(photoUri).base64();
             const analyzeFn = httpsCallable(functions, 'analyzeMealImage');
 
             const response = await analyzeFn({
-                imageBase64: base64,
+                imageBase64: photoBase64,
                 mimeType: 'image/jpeg',
                 dishName: dishName // Pass user input as hint
             });
