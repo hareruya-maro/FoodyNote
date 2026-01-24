@@ -65,5 +65,48 @@ export default {
         freq: "頻度",
         noPatterns: "まだパターンは検出されていません。",
         insight: "あなたのデータは「{{name}}」が症状の前に頻繁に現れることを示唆しています。エピソード前の{{count}}回の食事で発見されました。"
+    },
+    doctor: {
+        reportTitle: "Foody Note レポート",
+        reviewSummary: "診断用サマリー",
+        stats: {
+            symptoms: "記録された症状",
+            totalRecorded: "記録総数",
+            avgLag: "平均ラグタイム",
+            eatingToSymptom: "食事から症状まで"
+        },
+        correlatedIngredients: "相関のある食材（分析ビュー）",
+        referAnalysis: "詳細なトリガーランキングアルゴリズムの結果については、「分析」タブを参照してください。",
+        recentEpisodes: "最近のエピソード",
+        noEpisodes: "記録されたエピソードはありません。",
+        condition: "状態: {{type}} ({{severity}})"
+    },
+    meal: {
+        takePhoto: "食事の写真を撮る",
+        tapToSnap: "タップして撮影",
+        selectFromLibrary: "ライブラリから選択",
+        dishNameLabel: "料理名",
+        dishNamePlaceholder: "料理名を入力（任意）",
+        detectedIngredients: "検出された食材",
+        detectedCount: "{{count}}個の食材を検出",
+        add: "追加",
+        analyzeHint: "「食事を分析」をタップして食材を検出します。",
+        analyzeBtn: "食事を分析",
+        saveBtn: "記録を保存",
+        analysisFailedTitle: "分析失敗",
+        analysisFailedMsg: "画像を分析できませんでした。もう一度試してください。",
+        errorTitle: "エラー"
+    },
+    symptom: {
+        question: "今の気分はどうですか？",
+        severityLabel: "重症度",
+        notesLabel: "メモ",
+        notesPlaceholder: "症状を詳しく書いてください（例：食後の鋭い痛み）",
+        saveBtn: "症状を保存"
+    },
+    login: {
+        subtitle: "写真一枚で、あなたの不調の隠れた原因を発見しましょう。",
+        startBtn: "同意して開始",
+        disclaimer: "続行することで、このアプリが医療機器ではなく、専門的な医療アドバイスの代わりにならないことに同意したものとみなされます。"
     }
 };

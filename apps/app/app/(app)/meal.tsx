@@ -7,10 +7,12 @@ import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebaseConfig';
 import { File } from 'expo-file-system';
 import { useAddMeal } from '../../hooks/useMeals';
+import { useTranslation } from 'react-i18next';
 
 export default function MealScreen() {
     const router = useRouter();
     const addMeal = useAddMeal();
+    const { t } = useTranslation();
 
     const [photoUri, setPhotoUri] = useState<string | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -56,7 +58,7 @@ export default function MealScreen() {
 
         } catch (e) {
             console.error(e);
-            Alert.alert("Analysis Failed", "Could not analyze the image. Please try again.");
+            Alert.alert(t('meal.analysisFailedTitle'), t('meal.analysisFailedMsg'));
         } finally {
             setIsAnalyzing(false);
         }
@@ -76,7 +78,7 @@ export default function MealScreen() {
                         router.replace('/');
                     }
                 },
-                onError: (err) => Alert.alert("Error", err.message)
+                onError: (err) => Alert.alert(t('meal.errorTitle'), err.message)
             });
         }
     };
@@ -86,21 +88,21 @@ export default function MealScreen() {
 
             {!photoUri ? (
                 <View className="flex-1 items-center justify-center p-6 bg-white">
-                    <Text className="text-xl font-bold text-gray-700 mb-8 text-center">Take a photo of your meal</Text>
+                    <Text className="text-xl font-bold text-gray-700 mb-8 text-center">{t('meal.takePhoto')}</Text>
 
                     <TouchableOpacity
                         onPress={() => pickImage()} // In real app, separate Camera vs Library logic
                         className="w-40 h-40 bg-gray-50 rounded-full items-center justify-center mb-6 shadow-sm border-2 border-dashed border-gray-300"
                     >
                         <Camera size={48} color="#9ca3af" />
-                        <Text className="text-gray-500 mt-2 font-medium">Tap to Snap</Text>
+                        <Text className="text-gray-500 mt-2 font-medium">{t('meal.tapToSnap')}</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                         onPress={pickImage}
                         className="bg-white px-6 py-3 rounded-full shadow-sm border border-gray-200"
                     >
-                        <Text className="text-gray-600 font-medium">Select from Library</Text>
+                        <Text className="text-gray-600 font-medium">{t('meal.selectFromLibrary')}</Text>
                     </TouchableOpacity>
                 </View>
             ) : (
@@ -117,20 +119,20 @@ export default function MealScreen() {
 
                     {/* Pre-Analysis Input View */}
                     <View className="bg-white p-5 rounded-2xl shadow-sm mb-6">
-                        <Text className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Dish Name</Text>
+                        <Text className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('meal.dishNameLabel')}</Text>
                         <TextInput
                             value={dishName}
                             onChangeText={setDishName}
-                            placeholder="Enter dish name (Optional)"
+                            placeholder={t('meal.dishNamePlaceholder')}
                             className="text-xl font-bold text-gray-800 border-b border-gray-200 py-2 mb-4"
                         />
 
                         {analysisDone ? (
                             <>
                                 <View className="flex-row items-center justify-between mb-3 mt-4">
-                                    <Text className="text-xs font-bold text-gray-500 uppercase tracking-widest">Detected Ingredients</Text>
+                                    <Text className="text-xs font-bold text-gray-500 uppercase tracking-widest">{t('meal.detectedIngredients')}</Text>
                                 </View>
-                                <Text className="text-gray-400 text-sm mb-4">{`Detected ${tags.length} ingredients`}</Text>
+                                <Text className="text-gray-400 text-sm mb-4">{t('meal.detectedCount', { count: tags.length })}</Text>
                                 <View className="flex-row flex-wrap gap-2">
                                     {tags.map((tag, i) => (
                                         <View key={i} className="bg-green-50 px-3 py-1.5 rounded-full flex-row items-center border border-green-100">
@@ -142,12 +144,12 @@ export default function MealScreen() {
                                     ))}
                                     <TouchableOpacity className="bg-gray-100 px-3 py-1.5 rounded-full flex-row items-center border border-dashed border-gray-300">
                                         <Plus size={14} color="#6b7280" />
-                                        <Text className="text-gray-500 text-sm font-medium ml-1">Add</Text>
+                                        <Text className="text-gray-500 text-sm font-medium ml-1">{t('meal.add')}</Text>
                                     </TouchableOpacity>
                                 </View>
                             </>
                         ) : (
-                            <Text className="text-gray-400 text-sm">Tap "Analyze Meal" to detect ingredients.</Text>
+                            <Text className="text-gray-400 text-sm">{t('meal.analyzeHint')}</Text>
                         )}
                     </View>
 
@@ -161,7 +163,7 @@ export default function MealScreen() {
                                 <ActivityIndicator color="white" />
                             ) : (
                                 <View className="flex-row items-center">
-                                    <Text className="text-white font-bold text-lg ml-2">Analyze Meal</Text>
+                                    <Text className="text-white font-bold text-lg ml-2">{t('meal.analyzeBtn')}</Text>
                                 </View>
                             )}
                         </TouchableOpacity>
@@ -176,7 +178,7 @@ export default function MealScreen() {
                             ) : (
                                 <View className="flex-row items-center">
                                     <Check color="white" size={20} />
-                                    <Text className="text-white font-bold text-lg ml-2">Save Record</Text>
+                                    <Text className="text-white font-bold text-lg ml-2">{t('meal.saveBtn')}</Text>
                                 </View>
                             )}
                         </TouchableOpacity>

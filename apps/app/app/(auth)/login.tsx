@@ -3,9 +3,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { signInAnonymously } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function Login() {
     const [loading, setLoading] = useState(false);
+    const { t } = useTranslation();
 
     const handlePress = async () => {
         setLoading(true);
@@ -26,7 +28,7 @@ export default function Login() {
                 </View>
                 <Text className="text-3xl font-extrabold text-gray-900 tracking-tight">Foody Note</Text>
                 <Text className="text-base text-gray-500 mt-3 text-center leading-6 px-4">
-                    Discover the hidden causes of your upset stomach with just a photo.
+                    {t('login.subtitle')}
                 </Text>
             </View>
 
@@ -38,12 +40,12 @@ export default function Login() {
                 {loading ? (
                     <ActivityIndicator color="white" />
                 ) : (
-                    <Text className="text-white font-bold text-lg">Agree & Start</Text>
+                    <Text className="text-white font-bold text-lg">{t('login.startBtn')}</Text>
                 )}
             </TouchableOpacity>
 
             <Text className="text-xs text-gray-400 mt-8 text-center px-8 leading-4">
-                By continuing, you agree that this app is not a medical device and should not replace professional medical advice.
+                {t('login.disclaimer')}
             </Text>
         </SafeAreaView>
     );
