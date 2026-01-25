@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { collection, query, orderBy, where, getDocs, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, where, getDocs, addDoc, Timestamp, doc, updateDoc, deleteField } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, db, storage, } from '../firebaseConfig';
 import { MealRecord } from '../types';
@@ -27,7 +27,7 @@ export function useAddMeal() {
     const user = auth.currentUser;
 
     return useMutation({
-        mutationFn: async (newMeal: { title: string; imageUri: string; tags: string[] }) => {
+        mutationFn: async (newMeal: { title: string; imageUri: string; tags: string[]; activeInquiry?: MealRecord['activeInquiry'] }) => {
             if (!user) throw new Error("Not authenticated");
 
             // 1. Upload Image
@@ -42,11 +42,28 @@ export function useAddMeal() {
             const docRef = await addDoc(collection(db, `users/${user.uid}/meals`), {
                 title: newMeal.title,
                 tags: newMeal.tags,
+                activeInquiry: newMeal.activeInquiry || null,
                 imageUri: downloadURL,
                 timestamp: new Date().toISOString(), // Keeping ISO string for frontend simplicity
             });
 
             return docRef.id;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['meals'] });
+        },
+    });
+}
+
+export function useUpdateMeal() {
+    const queryClient = useQueryClient();
+    const user = auth.currentUser;
+
+    return useMutation({
+        mutationFn: async ({ id, updates }: { id: string; updates: Partial<MealRecord> | { activeInquiry: any } }) => {
+            if (!user) throw new Error("Not authenticated");
+            const docRef = doc(db, `users/${user.uid}/meals`, id);
+            await updateDoc(docRef, updates);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['meals'] });

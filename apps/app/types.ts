@@ -5,6 +5,13 @@ export type MealRecord = {
     title: string; // e.g. "Lunch" or inferred dish name
     tags: string[]; // Inferred ingredients
     note?: string;
+    activeInquiry?: {
+        question: string;
+        options: {
+            label: string;
+            tags: string[];
+        }[];
+    };
 };
 
 export type SymptomType = 'bloated' | 'pain' | 'nausea' | 'other';

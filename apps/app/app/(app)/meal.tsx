@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, Alert, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, Alert, TextInput, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Camera, Check, Plus, X } from 'lucide-react-native';
 import { useState } from 'react';
@@ -20,6 +20,10 @@ export default function MealScreen() {
     const [dishName, setDishName] = useState('');
     const [analysisDone, setAnalysisDone] = useState(false);
 
+    // Active Inquiry State
+    const [activeInquiry, setActiveInquiry] = useState<{ question: string, options: { label: string, tags: string[] }[] } | null>(null);
+    const [showInquiryModal, setShowInquiryModal] = useState(false);
+
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: "images",
@@ -34,7 +38,9 @@ export default function MealScreen() {
             setPhotoBase64(result.assets[0].base64 || null);
             setAnalysisDone(false);
             setTags([]);
-            // Do not start analysis automatically
+            setDishName('');
+            setActiveInquiry(null);
+            setShowInquiryModal(false);
         }
     };
 
@@ -43,6 +49,8 @@ export default function MealScreen() {
 
         setIsAnalyzing(true);
         setTags([]);
+        setActiveInquiry(null);
+
         try {
             const analyzeFn = httpsCallable(functions, 'analyzeMealImage');
 
@@ -53,10 +61,15 @@ export default function MealScreen() {
                 language: i18n.language
             });
 
-            const data = response.data as { dishName: string, ingredients: string[] };
+            const data = response.data as { dishName: string, ingredients: string[], activeInquiry?: { question: string, options: { label: string, tags: string[] }[] } };
             setTags(data.ingredients);
             setDishName(data.dishName);
             setAnalysisDone(true);
+
+            if (data.activeInquiry) {
+                setActiveInquiry(data.activeInquiry);
+                setShowInquiryModal(true);
+            }
 
         } catch (e) {
             console.error(e);
@@ -66,12 +79,29 @@ export default function MealScreen() {
         }
     };
 
+    const handleInquiryAnswer = (option: { label: string, tags: string[] }) => {
+        // Append new tags, avoiding duplicates
+        const newTags = [...tags];
+        option.tags.forEach(t => {
+            if (!newTags.includes(t)) newTags.push(t);
+        });
+        setTags(newTags);
+        setActiveInquiry(null); // Answered, so remove it
+        setShowInquiryModal(false);
+    };
+
+    const handleInquiryLater = () => {
+        setShowInquiryModal(false);
+        // activeInquiry remains in state and will be saved via handleSave
+    };
+
     const handleSave = () => {
         if (photoUri) {
             addMeal.mutate({
                 title: dishName || 'My Meal',
                 imageUri: photoUri,
                 tags: tags,
+                activeInquiry: activeInquiry || undefined
             }, {
                 onSuccess: () => {
                     if (router.canGoBack()) {
@@ -189,6 +219,39 @@ export default function MealScreen() {
                     <View className="h-20" />
                 </ScrollView>
             )}
+
+            <Modal
+                visible={showInquiryModal}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setShowInquiryModal(false)}
+            >
+                <View className="flex-1 justify-end bg-black/50">
+                    <View className="bg-white rounded-t-3xl p-6 shadow-xl pb-10">
+                        <Text className="text-xl font-bold text-gray-800 mb-2">Foody AI Question</Text>
+                        <Text className="text-gray-600 mb-6 text-lg leading-relaxed">{activeInquiry?.question}</Text>
+
+                        <View className="flex-row flex-wrap gap-3 justify-center">
+                            {activeInquiry?.options.map((option, idx) => (
+                                <TouchableOpacity
+                                    key={idx}
+                                    onPress={() => handleInquiryAnswer(option)}
+                                    className="bg-teal-50 px-4 py-4 rounded-xl border border-teal-100 min-w-[45%] mb-2 shadow-sm"
+                                >
+                                    <Text className="text-teal-800 font-bold text-center">{option.label}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        <TouchableOpacity
+                            onPress={handleInquiryLater}
+                            className="mt-4 pt-4 border-t border-gray-100"
+                        >
+                            <Text className="text-gray-400 text-center font-medium">{t('meal.askMeLater', 'Ask me later')}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }

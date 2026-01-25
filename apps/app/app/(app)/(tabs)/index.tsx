@@ -1,9 +1,14 @@
-import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { deleteField } from 'firebase/firestore';
+// ... (I need to ensure imports are correct, easier to just add the logic block and let imports be handled or assume basics present. 
+// Actually, I'll rewrite the component part largely to include the header)
+
+// To be safe and avoid "missing imports" errors:
+import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native'; // Added Alert
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Camera, Activity, Frown, Meh, AlertCircle } from 'lucide-react-native';
+import { Camera, Activity, Frown, Meh, AlertCircle, HelpCircle } from 'lucide-react-native'; // Added HelpCircle
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
-import { useMeals } from '../../../hooks/useMeals';
+import { useMeals, useUpdateMeal } from '../../../hooks/useMeals'; // Added useUpdateMeal
 import { useSymptoms } from '../../../hooks/useSymptoms';
 import { MealRecord, SymptomRecord } from '../../../types';
 import { format } from 'date-fns';
@@ -19,12 +24,12 @@ export default function HomeScreen() {
   const router = useRouter();
   const { data: meals, isLoading: mealsLoading } = useMeals();
   const { data: symptoms, isLoading: symptomsLoading } = useSymptoms();
+  const updateMeal = useUpdateMeal();
   const { t } = useTranslation();
 
   const timelineData = useMemo(() => {
     if (!meals || !symptoms) return [];
 
-    // Sort logic handled in hook query usually, but re-sort for combined list
     const combined: TimelineItem[] = [
       ...meals.map(m => ({ type: 'meal' as const, data: m, timestamp: m.timestamp })),
       ...symptoms.map(s => ({ type: 'symptom' as const, data: s, timestamp: s.timestamp })),
@@ -32,10 +37,66 @@ export default function HomeScreen() {
     return combined.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }, [meals, symptoms]);
 
+  const pendingInquiries = useMemo(() => {
+    return meals?.filter(m => m.activeInquiry) || [];
+  }, [meals]);
+
+  const handleAnswerInquiry = async (meal: MealRecord, option: { label: string, tags: string[] }) => {
+    // Merge tags
+    const currentTags = meal.tags || [];
+    const newTags = [...currentTags];
+    option.tags.forEach(tag => {
+      if (!newTags.includes(tag)) newTags.push(tag);
+    });
+
+    try {
+      await updateMeal.mutateAsync({
+        id: meal.id,
+        // @ts-ignore: deleteField type compatibility
+        updates: {
+          tags: newTags,
+          activeInquiry: deleteField()
+        }
+      });
+    } catch (e) {
+      Alert.alert("Error", "Failed to update meal.");
+    }
+  };
+
+  const renderActiveInquiry = ({ item }: { item: MealRecord }) => (
+    <View key={item.id} className="bg-white mx-4 mb-4 p-5 rounded-2xl shadow-sm border-l-4 border-yellow-400">
+      <View className="flex-row items-center mb-2">
+        <HelpCircle size={20} color="#eab308" />
+        <Text className="text-yellow-600 font-bold ml-2">Confirmation Needed</Text>
+        <Text className="text-gray-400 text-xs ml-auto">{format(new Date(item.timestamp), 'HH:mm')} • {item.title}</Text>
+      </View>
+      <Text className="text-gray-800 font-medium mb-4 text-lg">{item.activeInquiry?.question}</Text>
+      <View className="flex-row gap-2 flex-wrap">
+        {item.activeInquiry?.options.map((opt, idx) => (
+          <TouchableOpacity
+            key={idx}
+            onPress={() => handleAnswerInquiry(item, opt)}
+            className="bg-yellow-50 px-4 py-2 rounded-lg border border-yellow-100 mb-1"
+          >
+            <Text className="text-yellow-800 font-bold">{opt.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </View>
+  );
+
   const renderItem = ({ item }: { item: TimelineItem }) => {
     const isMeal = item.type === 'meal';
     const date = new Date(item.timestamp);
     const timeStr = format(date, 'HH:mm');
+    const meal = isMeal ? (item.data as MealRecord) : null;
+
+    // If meal has active inquiry, show it in the list? 
+    // Spec says "Timeline Top". So we probably shouldn't show the inquiry *inside* the timeline item 
+    // unless the card replaces the normal view. 
+    // But the normal view shows "Meal". The inquiry is "Additional info needed".
+    // I already implemented the Top Cards in pendingInquiries.
+    // So the timeline item remains as "Meal record".
 
     return (
       <View className={`mb-4 p-4 rounded-2xl shadow-sm mx-4 ${!isMeal ? 'bg-red-50 border border-red-100' : 'bg-white'}`}>
@@ -55,6 +116,12 @@ export default function HomeScreen() {
                       <Text className="text-xs text-gray-600">#{tag}</Text>
                     </View>
                   ))}
+                  {/* Indicator if pending inquiry exists for this meal */}
+                  {(item.data as MealRecord).activeInquiry && (
+                    <View className="bg-yellow-100 px-2 py-0.5 rounded-full mr-1 mb-1 border border-yellow-200">
+                      <Text className="text-xs text-yellow-700">? Check top</Text>
+                    </View>
+                  )}
                 </View>
                 {(item.data as MealRecord).imageUri && (
                   <View className="h-40 bg-gray-200 rounded-xl w-full items-center justify-center overflow-hidden">
@@ -63,7 +130,7 @@ export default function HomeScreen() {
                 )}
               </View>
             ) : (
-              // Symptom Item
+              // ... (Symptom Item logic unchanged)
               <View>
                 <View className="flex-row items-center mb-1">
                   {(item.data as SymptomRecord).type === 'pain' && <Frown size={20} color="#ef4444" />}
@@ -105,6 +172,11 @@ export default function HomeScreen() {
         renderItem={renderItem}
         keyExtractor={(item, index) => item.type + item.timestamp + index}
         contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
+        ListHeaderComponent={
+          <View>
+            {pendingInquiries.map(meal => renderActiveInquiry({ item: meal }))}
+          </View>
+        }
         ListEmptyComponent={
           <View className="items-center justify-center py-20">
             <Text className="text-gray-400">{t('home.noRecords')}</Text>
