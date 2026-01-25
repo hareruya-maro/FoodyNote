@@ -3,7 +3,7 @@ import { deleteField } from 'firebase/firestore';
 // Actually, I'll rewrite the component part largely to include the header)
 
 // To be safe and avoid "missing imports" errors:
-import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native'; // Added Alert
+import { View, Text, SectionList, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native'; // Added Alert
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Camera, Activity, Frown, Meh, AlertCircle, HelpCircle } from 'lucide-react-native'; // Added HelpCircle
 import { useRouter } from 'expo-router';
@@ -13,8 +13,9 @@ import { useSymptoms } from '../../../hooks/useSymptoms';
 import { MealRecord, SymptomRecord } from '../../../types';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { TimelineItem } from '../../../components/TimelineItem';
 
-type TimelineItem = {
+type TimelineItemType = {
   type: 'meal' | 'symptom';
   data: MealRecord | SymptomRecord;
   timestamp: string;
@@ -27,14 +28,27 @@ export default function HomeScreen() {
   const updateMeal = useUpdateMeal();
   const { t } = useTranslation();
 
-  const timelineData = useMemo(() => {
+  const sectionData = useMemo(() => {
     if (!meals || !symptoms) return [];
 
-    const combined: TimelineItem[] = [
+    const combined: TimelineItemType[] = [
       ...meals.map(m => ({ type: 'meal' as const, data: m, timestamp: m.timestamp })),
       ...symptoms.map(s => ({ type: 'symptom' as const, data: s, timestamp: s.timestamp })),
-    ];
-    return combined.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    const grouped = combined.reduce((acc, item) => {
+      const dateKey = format(new Date(item.timestamp), 'yyyy-MM-dd');
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
+      }
+      acc[dateKey].push(item);
+      return acc;
+    }, {} as Record<string, TimelineItemType[]>);
+
+    return Object.entries(grouped).map(([date, data]) => ({
+      title: date,
+      data,
+    }));
   }, [meals, symptoms]);
 
   const pendingInquiries = useMemo(() => {
@@ -85,81 +99,17 @@ export default function HomeScreen() {
     </View>
   );
 
-  const renderItem = ({ item }: { item: TimelineItem }) => {
-    const isMeal = item.type === 'meal';
-    const date = new Date(item.timestamp);
-    const timeStr = format(date, 'HH:mm');
+  const renderItem = ({ item }: { item: TimelineItemType }) => (
+    <TimelineItem item={item} />
+  );
 
-    // If meal has active inquiry, show it in the list? 
-    // Spec says "Timeline Top". So we probably shouldn't show the inquiry *inside* the timeline item 
-    // unless the card replaces the normal view. 
-    // But the normal view shows "Meal". The inquiry is "Additional info needed".
-    // I already implemented the Top Cards in pendingInquiries.
-    // So the timeline item remains as "Meal record".
-
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          if (isMeal) {
-            router.push({ pathname: '/meal', params: { id: item.data.id } });
-          } else {
-            router.push({ pathname: '/symptom', params: { id: item.data.id } });
-          }
-        }}
-        className={`mb-4 p-4 rounded-2xl shadow-sm mx-4 ${!isMeal ? 'bg-red-50 border border-red-100' : 'bg-white'}`}
-      >
-        <View className="flex-row items-start">
-          <View className="mr-4 pt-1 w-10">
-            <Text className="text-gray-500 font-medium text-xs">{timeStr}</Text>
-          </View>
-
-          <View className="flex-1">
-            {isMeal ? (
-              // Meal Item
-              <View>
-                <Text className="text-lg font-bold text-gray-800">{(item.data as MealRecord).title}</Text>
-                <View className="flex-row flex-wrap mt-1 mb-2">
-                  {(item.data as MealRecord).tags.map((tag, idx) => (
-                    <View key={idx} className="bg-gray-100 px-2 py-0.5 rounded-full mr-1 mb-1">
-                      <Text className="text-xs text-gray-600">#{tag}</Text>
-                    </View>
-                  ))}
-                  {/* Indicator if pending inquiry exists for this meal */}
-                  {(item.data as MealRecord).activeInquiry && (
-                    <View className="bg-yellow-100 px-2 py-0.5 rounded-full mr-1 mb-1 border border-yellow-200">
-                      <Text className="text-xs text-yellow-700">? Check top</Text>
-                    </View>
-                  )}
-                </View>
-                {(item.data as MealRecord).imageUri && (
-                  <View className="h-40 bg-gray-200 rounded-xl w-full items-center justify-center overflow-hidden">
-                    <Image source={{ uri: (item.data as MealRecord).imageUri }} className="w-full h-full" resizeMode="cover" />
-                  </View>
-                )}
-              </View>
-            ) : (
-              // ... (Symptom Item logic unchanged)
-              <View>
-                <View className="flex-row items-center mb-1">
-                  {(item.data as SymptomRecord).type === 'pain' && <Frown size={20} color="#ef4444" />}
-                  {(item.data as SymptomRecord).type === 'bloated' && <Meh size={20} color="#ca8a04" />}
-                  {(item.data as SymptomRecord).type === 'nausea' && <AlertCircle size={20} color="#3b82f6" />}
-
-                  <Text className="text-lg font-bold text-gray-800 ml-2 capitalize">{t(`symptoms.types.${(item.data as SymptomRecord).type}`, { defaultValue: (item.data as SymptomRecord).type })}</Text>
-                  <View className="ml-2 bg-white/50 px-2 py-0.5 rounded-full border border-gray-200">
-                    <Text className="text-xs font-bold text-gray-600 capitalize">{t(`symptoms.severities.${(item.data as SymptomRecord).severity}`, { defaultValue: (item.data as SymptomRecord).severity })}</Text>
-                  </View>
-                </View>
-                {(item.data as SymptomRecord).note ? (
-                  <Text className="text-gray-600 mt-1">{(item.data as SymptomRecord).note}</Text>
-                ) : null}
-              </View>
-            )}
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+  const renderSectionHeader = ({ section: { title } }: { section: { title: string } }) => (
+    <View className="px-6 py-2 bg-gray-50/90 backdrop-blur-sm">
+      <Text className="text-gray-500 font-bold text-sm uppercase tracking-wider">
+        {format(new Date(title), 'MMM d, yyyy')}
+      </Text>
+    </View>
+  );
 
   if (mealsLoading || symptomsLoading) {
     return (
@@ -175,11 +125,13 @@ export default function HomeScreen() {
         <Text className="text-2xl font-extrabold text-primary">Foody Note</Text>
       </View>
 
-      <FlatList
-        data={timelineData}
+      <SectionList
+        sections={sectionData}
         renderItem={renderItem}
-        keyExtractor={(item, index) => item.type + item.timestamp + index}
-        contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
+        renderSectionHeader={renderSectionHeader}
+        keyExtractor={(item: TimelineItemType, index: number) => item.type + item.timestamp + index}
+        contentContainerStyle={{ paddingBottom: 100 }}
+        stickySectionHeadersEnabled={true}
         ListHeaderComponent={
           <View>
             {pendingInquiries.map(meal => renderActiveInquiry({ item: meal }))}
