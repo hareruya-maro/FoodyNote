@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { collection, query, orderBy, getDocs, addDoc } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebaseConfig';
 import { SymptomRecord } from '../types';
 
@@ -26,13 +26,29 @@ export function useAddSymptom() {
     const user = auth.currentUser;
 
     return useMutation({
-        mutationFn: async (newSymptom: Omit<SymptomRecord, 'id' | 'timestamp'>) => {
+        mutationFn: async (newSymptom: Omit<SymptomRecord, 'id'>) => {
             if (!user) throw new Error("Not authenticated");
 
             await addDoc(collection(db, `users/${user.uid}/symptoms`), {
                 ...newSymptom,
-                timestamp: new Date().toISOString(),
+                timestamp: newSymptom.timestamp || new Date().toISOString(),
             });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['symptoms'] });
+        },
+    });
+}
+
+export function useUpdateSymptom() {
+    const queryClient = useQueryClient();
+    const user = auth.currentUser;
+
+    return useMutation({
+        mutationFn: async ({ id, updates }: { id: string; updates: Partial<SymptomRecord> }) => {
+            if (!user) throw new Error("Not authenticated");
+            const docRef = doc(db, `users/${user.uid}/symptoms`, id);
+            await updateDoc(docRef, updates);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['symptoms'] });

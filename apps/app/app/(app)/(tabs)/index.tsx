@@ -58,7 +58,7 @@ export default function HomeScreen() {
           activeInquiry: deleteField()
         }
       });
-    } catch (e) {
+    } catch {
       Alert.alert("Error", "Failed to update meal.");
     }
   };
@@ -89,7 +89,6 @@ export default function HomeScreen() {
     const isMeal = item.type === 'meal';
     const date = new Date(item.timestamp);
     const timeStr = format(date, 'HH:mm');
-    const meal = isMeal ? (item.data as MealRecord) : null;
 
     // If meal has active inquiry, show it in the list? 
     // Spec says "Timeline Top". So we probably shouldn't show the inquiry *inside* the timeline item 
@@ -99,7 +98,16 @@ export default function HomeScreen() {
     // So the timeline item remains as "Meal record".
 
     return (
-      <View className={`mb-4 p-4 rounded-2xl shadow-sm mx-4 ${!isMeal ? 'bg-red-50 border border-red-100' : 'bg-white'}`}>
+      <TouchableOpacity
+        onPress={() => {
+          if (isMeal) {
+            router.push({ pathname: '/meal', params: { id: item.data.id } });
+          } else {
+            router.push({ pathname: '/symptom', params: { id: item.data.id } });
+          }
+        }}
+        className={`mb-4 p-4 rounded-2xl shadow-sm mx-4 ${!isMeal ? 'bg-red-50 border border-red-100' : 'bg-white'}`}
+      >
         <View className="flex-row items-start">
           <View className="mr-4 pt-1 w-10">
             <Text className="text-gray-500 font-medium text-xs">{timeStr}</Text>
@@ -149,7 +157,7 @@ export default function HomeScreen() {
             )}
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 

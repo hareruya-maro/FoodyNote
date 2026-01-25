@@ -1,40 +1,143 @@
-import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Frown, Meh, AlertCircle, Save } from 'lucide-react-native';
-import { useState } from 'react';
-import { useAddSymptom } from '../../hooks/useSymptoms';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { Frown, Meh, AlertCircle, Save, Calendar as CalendarIcon, Clock } from 'lucide-react-native';
+import { useState, useEffect } from 'react';
+import { useAddSymptom, useUpdateSymptom, useSymptoms } from '../../hooks/useSymptoms';
 import { SymptomType, SeverityLevel } from '../../types';
 import { useTranslation } from 'react-i18next';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { format } from 'date-fns';
 
 export default function SymptomScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ id: string }>();
+  const isEditing = !!params.id;
+
   const addSymptom = useAddSymptom();
+  const updateSymptom = useUpdateSymptom();
+  const { data: symptoms } = useSymptoms();
   const { t } = useTranslation();
 
   const [type, setType] = useState<SymptomType>('bloated');
   const [severity, setSeverity] = useState<SeverityLevel>('medium');
   const [note, setNote] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [mode, setMode] = useState<'date' | 'time'>('date');
+
+  useEffect(() => {
+    if (isEditing && symptoms) {
+      const existing = symptoms.find(s => s.id === params.id);
+      if (existing) {
+        setType(existing.type);
+        setSeverity(existing.severity);
+        setNote(existing.note || '');
+        setDate(new Date(existing.timestamp));
+      }
+    }
+  }, [isEditing, params.id, symptoms]);
+
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
+  };
+
+  const showMode = (currentMode: 'date' | 'time') => {
+    setShowDatePicker(true);
+    setMode(currentMode);
+  };
 
   const handleSave = () => {
-    addSymptom.mutate({
+    const symptomData = {
       type,
       severity,
-      note
-    }, {
-      onSuccess: () => {
-        if (router.canGoBack()) {
-          router.back();
-        } else {
-          router.replace('/');
-        }
-      }
-    });
+      note,
+      timestamp: date.toISOString()
+    };
+
+    if (isEditing && params.id) {
+      updateSymptom.mutate({
+        id: params.id,
+        updates: symptomData
+      }, {
+        onSuccess: () => router.back(),
+        onError: (err) => Alert.alert("Error", "Failed to update symptom")
+      });
+    } else {
+      addSymptom.mutate(symptomData, {
+        onSuccess: () => {
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.replace('/');
+          }
+        },
+        onError: (err) => Alert.alert("Error", "Failed to add symptom")
+      });
+    }
   };
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1 bg-white">
       <ScrollView className="p-6">
-        <Text className="text-xl font-bold text-gray-800 mb-6">{t('symptom.question')}</Text>
+        <Text className="text-xl font-bold text-gray-800 mb-6">
+          {isEditing ? t('symptom.editTitle', 'Edit Symptom') : t('symptom.question')}
+        </Text>
+
+        <View className="mb-6">
+          <Text className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">{t('common.date', 'Date & Time')}</Text>
+          {Platform.OS === 'web' ? (
+            <View className="flex-row gap-3">
+              {/* @ts-ignore */}
+              <input
+                type="date"
+                value={format(date, 'yyyy-MM-dd')}
+                onChange={(e: any) => {
+                  const newDate = new Date(date);
+                  const [y, m, d] = e.target.value.split('-').map(Number);
+                  newDate.setFullYear(y, m - 1, d);
+                  setDate(newDate);
+                }}
+                style={{ padding: 10, borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb', flex: 1, fontSize: 16 }}
+              />
+              {/* @ts-ignore */}
+              <input
+                type="time"
+                value={format(date, 'HH:mm')}
+                onChange={(e: any) => {
+                  const newDate = new Date(date);
+                  const [h, m] = e.target.value.split(':').map(Number);
+                  newDate.setHours(h, m);
+                  setDate(newDate);
+                }}
+                style={{ padding: 10, borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb', flex: 1, fontSize: 16 }}
+              />
+            </View>
+          ) : (
+            <>
+              <View className="flex-row gap-3">
+                <TouchableOpacity onPress={() => showMode('date')} className="flex-1 flex-row items-center bg-gray-50 p-3 rounded-xl border border-gray-200">
+                  <CalendarIcon size={20} color="#6b7280" />
+                  <Text className="ml-2 text-gray-700 font-medium">{format(date, 'yyyy/MM/dd')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => showMode('time')} className="flex-1 flex-row items-center bg-gray-50 p-3 rounded-xl border border-gray-200">
+                  <Clock size={20} color="#6b7280" />
+                  <Text className="ml-2 text-gray-700 font-medium">{format(date, 'HH:mm')}</Text>
+                </TouchableOpacity>
+              </View>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={date}
+                  mode={mode}
+                  is24Hour={true}
+                  onChange={onDateChange}
+                />
+              )}
+            </>
+          )}
+        </View>
 
         <View className="flex-row justify-between mb-8">
           <OptionButton
@@ -93,7 +196,9 @@ export default function SymptomScreen() {
           ) : (
             <View className="flex-row items-center">
               <Save size={20} color="white" />
-              <Text className="text-white font-bold text-lg ml-2">{t('symptom.saveBtn')}</Text>
+              <Text className="text-white font-bold text-lg ml-2">
+                {isEditing ? t('common.update', 'Update') : t('symptom.saveBtn')}
+              </Text>
             </View>
           )}
         </TouchableOpacity>

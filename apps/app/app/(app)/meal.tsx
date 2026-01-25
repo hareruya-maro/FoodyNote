@@ -1,16 +1,23 @@
-import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, Alert, TextInput, Modal } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Camera, Check, Plus, X } from 'lucide-react-native';
-import { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, Alert, TextInput, Modal, Platform } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { Camera, Check, Plus, X, Calendar as CalendarIcon, Clock } from 'lucide-react-native';
+import { useState, useEffect } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebaseConfig';
-import { useAddMeal } from '../../hooks/useMeals';
+import { useAddMeal, useUpdateMeal, useMeals } from '../../hooks/useMeals';
 import { useTranslation } from 'react-i18next';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { format } from 'date-fns';
 
 export default function MealScreen() {
     const router = useRouter();
+    const params = useLocalSearchParams<{ id: string }>();
+    const isEditing = !!params.id;
+
     const addMeal = useAddMeal();
+    const updateMeal = useUpdateMeal();
+    const { data: meals } = useMeals();
     const { t, i18n } = useTranslation();
 
     const [photoUri, setPhotoUri] = useState<string | null>(null);
@@ -19,10 +26,41 @@ export default function MealScreen() {
     const [tags, setTags] = useState<string[]>([]);
     const [dishName, setDishName] = useState('');
     const [analysisDone, setAnalysisDone] = useState(false);
+    const [date, setDate] = useState(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [mode, setMode] = useState<'date' | 'time'>('date');
 
     // Active Inquiry State
     const [activeInquiry, setActiveInquiry] = useState<{ question: string, options: { label: string, tags: string[] }[] } | null>(null);
     const [showInquiryModal, setShowInquiryModal] = useState(false);
+
+    useEffect(() => {
+        if (isEditing && meals) {
+            const existing = meals.find(m => m.id === params.id);
+            if (existing) {
+                setPhotoUri(existing.imageUri || null);
+                setDishName(existing.title);
+                setTags(existing.tags);
+                setAnalysisDone(true);
+                setDate(new Date(existing.timestamp));
+                if (existing.activeInquiry) {
+                    setActiveInquiry(existing.activeInquiry);
+                }
+            }
+        }
+    }, [isEditing, params.id, meals]);
+
+    const onDateChange = (event: any, selectedDate?: Date) => {
+        setShowDatePicker(false);
+        if (selectedDate) {
+            setDate(selectedDate);
+        }
+    };
+
+    const showMode = (currentMode: 'date' | 'time') => {
+        setShowDatePicker(true);
+        setMode(currentMode);
+    };
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -97,21 +135,38 @@ export default function MealScreen() {
 
     const handleSave = () => {
         if (photoUri) {
-            addMeal.mutate({
-                title: dishName || 'My Meal',
-                imageUri: photoUri,
-                tags: tags,
-                activeInquiry: activeInquiry || undefined
-            }, {
-                onSuccess: () => {
-                    if (router.canGoBack()) {
-                        router.back();
-                    } else {
-                        router.replace('/');
+            if (isEditing && params.id) {
+                updateMeal.mutate({
+                    id: params.id,
+                    updates: {
+                        title: dishName || 'My Meal',
+                        tags: tags,
+                        activeInquiry: activeInquiry || undefined,
+                        timestamp: date.toISOString()
+                        // Note: Handling image update requires re-upload logic, skipping for now as per MVP
                     }
-                },
-                onError: (err) => Alert.alert(t('meal.errorTitle'), err.message)
-            });
+                }, {
+                    onSuccess: () => router.back(),
+                    onError: (err) => Alert.alert(t('meal.errorTitle'), err.message)
+                });
+            } else {
+                addMeal.mutate({
+                    title: dishName || 'My Meal',
+                    imageUri: photoUri,
+                    tags: tags,
+                    activeInquiry: activeInquiry || undefined,
+                    timestamp: date.toISOString()
+                }, {
+                    onSuccess: () => {
+                        if (router.canGoBack()) {
+                            router.back();
+                        } else {
+                            router.replace('/');
+                        }
+                    },
+                    onError: (err) => Alert.alert(t('meal.errorTitle'), err.message)
+                });
+            }
         }
     };
 
@@ -158,6 +213,59 @@ export default function MealScreen() {
                             placeholder={t('meal.dishNamePlaceholder')}
                             className="text-xl font-bold text-gray-800 border-b border-gray-200 py-2 mb-4"
                         />
+
+                        <View className="mb-4">
+                            <Text className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('common.date', 'Date & Time')}</Text>
+                            {Platform.OS === 'web' ? (
+                                <View className="flex-row gap-3">
+                                    {/* @ts-ignore */}
+                                    <input
+                                        type="date"
+                                        value={format(date, 'yyyy-MM-dd')}
+                                        onChange={(e: any) => {
+                                            const newDate = new Date(date);
+                                            const [y, m, d] = e.target.value.split('-').map(Number);
+                                            newDate.setFullYear(y, m - 1, d);
+                                            setDate(newDate);
+                                        }}
+                                        style={{ padding: 10, borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb', flex: 1, fontSize: 16 }}
+                                    />
+                                    {/* @ts-ignore */}
+                                    <input
+                                        type="time"
+                                        value={format(date, 'HH:mm')}
+                                        onChange={(e: any) => {
+                                            const newDate = new Date(date);
+                                            const [h, m] = e.target.value.split(':').map(Number);
+                                            newDate.setHours(h, m);
+                                            setDate(newDate);
+                                        }}
+                                        style={{ padding: 10, borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb', flex: 1, fontSize: 16 }}
+                                    />
+                                </View>
+                            ) : (
+                                <>
+                                    <View className="flex-row gap-3">
+                                        <TouchableOpacity onPress={() => showMode('date')} className="flex-1 flex-row items-center bg-gray-50 p-3 rounded-xl border border-gray-200">
+                                            <CalendarIcon size={20} color="#6b7280" />
+                                            <Text className="ml-2 text-gray-700 font-medium">{format(date, 'yyyy/MM/dd')}</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => showMode('time')} className="flex-1 flex-row items-center bg-gray-50 p-3 rounded-xl border border-gray-200">
+                                            <Clock size={20} color="#6b7280" />
+                                            <Text className="ml-2 text-gray-700 font-medium">{format(date, 'HH:mm')}</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    {showDatePicker && (
+                                        <DateTimePicker
+                                            value={date}
+                                            mode={mode}
+                                            is24Hour={true}
+                                            onChange={onDateChange}
+                                        />
+                                    )}
+                                </>
+                            )}
+                        </View>
 
                         {analysisDone ? (
                             <>
@@ -210,7 +318,9 @@ export default function MealScreen() {
                             ) : (
                                 <View className="flex-row items-center">
                                     <Check color="white" size={20} />
-                                    <Text className="text-white font-bold text-lg ml-2">{t('meal.saveBtn')}</Text>
+                                    <Text className="text-white font-bold text-lg ml-2">
+                                        {isEditing ? t('common.update', 'Update') : t('meal.saveBtn')}
+                                    </Text>
                                 </View>
                             )}
                         </TouchableOpacity>

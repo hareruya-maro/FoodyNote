@@ -27,7 +27,7 @@ export function useAddMeal() {
     const user = auth.currentUser;
 
     return useMutation({
-        mutationFn: async (newMeal: { title: string; imageUri: string; tags: string[]; activeInquiry?: MealRecord['activeInquiry'] }) => {
+        mutationFn: async (newMeal: { title: string; imageUri: string; tags: string[]; activeInquiry?: MealRecord['activeInquiry']; timestamp?: string }) => {
             if (!user) throw new Error("Not authenticated");
 
             // 1. Upload Image
@@ -44,7 +44,7 @@ export function useAddMeal() {
                 tags: newMeal.tags,
                 activeInquiry: newMeal.activeInquiry || null,
                 imageUri: downloadURL,
-                timestamp: new Date().toISOString(), // Keeping ISO string for frontend simplicity
+                timestamp: newMeal.timestamp || new Date().toISOString(),
             });
 
             return docRef.id;
