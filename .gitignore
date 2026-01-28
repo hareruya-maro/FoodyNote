@@ -3,3 +3,4 @@ lib
 .turbo
 *.log
 .firebase
+test-assets

@@ -297,7 +297,7 @@ export default function MealScreen() {
                         <TouchableOpacity
                             onPress={startAnalysis}
                             disabled={isAnalyzing}
-                            className={`w-full py-4 rounded-xl items-center shadow-lg transition-transform ${isAnalyzing ? 'bg-gray-300' : 'bg-secondary active:scale-95'}`}
+                            className={`w-full py-4 rounded-xl items-center shadow-lg transition-transform ${isAnalyzing ? 'bg-gray-300' : 'bg-accent active:scale-95'}`}
                         >
                             {isAnalyzing ? (
                                 <ActivityIndicator color="white" />
