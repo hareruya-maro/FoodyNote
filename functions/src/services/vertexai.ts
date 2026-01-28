@@ -63,7 +63,8 @@ export async function generateContent(imageBase64: string, mimeType: string = 'i
             },
             thinkingConfig: {
                 thinkingLevel: ThinkingLevel.LOW,
-            }
+            },
+            tools: [{ codeExecution: {} }],
         }
     });
 
