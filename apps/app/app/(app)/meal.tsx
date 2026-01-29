@@ -6,6 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebaseConfig';
 import { useAddMeal, useUpdateMeal, useMeals } from '../../hooks/useMeals';
+import { Tag } from '../../types';
 import { useTranslation } from 'react-i18next';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
@@ -23,7 +24,7 @@ export default function MealScreen() {
     const [photoUri, setPhotoUri] = useState<string | null>(null);
     const [photoBase64, setPhotoBase64] = useState<string | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
-    const [tags, setTags] = useState<string[]>([]);
+    const [tags, setTags] = useState<Tag[]>([]);
     const [dishName, setDishName] = useState('');
     const [analysisDone, setAnalysisDone] = useState(false);
     const [date, setDate] = useState(new Date());
@@ -31,7 +32,7 @@ export default function MealScreen() {
     const [mode, setMode] = useState<'date' | 'time'>('date');
 
     // Active Inquiry State
-    const [activeInquiry, setActiveInquiry] = useState<{ question: string, options: { label: string, tags: string[] }[] } | null>(null);
+    const [activeInquiry, setActiveInquiry] = useState<{ question: string, options: { label: string, tags: Tag[] }[] } | null>(null);
     const [showInquiryModal, setShowInquiryModal] = useState(false);
 
     useEffect(() => {
@@ -40,6 +41,9 @@ export default function MealScreen() {
             if (existing) {
                 setPhotoUri(existing.imageUri || null);
                 setDishName(existing.title);
+                // Backward compatibility check (if old data is string[], force ignore or simple mapping?)
+                // User said old data can be ignored, but let's be safe: casting or simple map if needed.
+                // Since user said ignore old data, we assume strict type compliance for new/refactored code.
                 setTags(existing.tags);
                 setAnalysisDone(true);
                 setDate(new Date(existing.timestamp));
@@ -99,7 +103,7 @@ export default function MealScreen() {
                 language: i18n.language
             });
 
-            const data = response.data as { dishName: string, ingredients: string[], activeInquiry?: { question: string, options: { label: string, tags: string[] }[] } };
+            const data = response.data as { dishName: string, ingredients: { id: string, label: string }[], activeInquiry?: { question: string, options: { label: string, tags: { id: string, label: string }[] }[] } };
             setTags(data.ingredients);
             setDishName(data.dishName);
             setAnalysisDone(true);
@@ -117,11 +121,11 @@ export default function MealScreen() {
         }
     };
 
-    const handleInquiryAnswer = (option: { label: string, tags: string[] }) => {
+    const handleInquiryAnswer = (option: { label: string, tags: Tag[] }) => {
         // Append new tags, avoiding duplicates
         const newTags = [...tags];
         option.tags.forEach(t => {
-            if (!newTags.includes(t)) newTags.push(t);
+            if (!newTags.some(existing => existing.id === t.id)) newTags.push(t);
         });
         setTags(newTags);
         setActiveInquiry(null); // Answered, so remove it
@@ -276,8 +280,8 @@ export default function MealScreen() {
                                 <View className="flex-row flex-wrap gap-2">
                                     {tags.map((tag, i) => (
                                         <View key={i} className="bg-green-50 px-3 py-1.5 rounded-full flex-row items-center border border-green-100">
-                                            <Text className="text-green-800 text-sm font-medium mr-1">#{tag}</Text>
-                                            <TouchableOpacity onPress={() => setTags(tags.filter(t => t !== tag))}>
+                                            <Text className="text-green-800 text-sm font-medium mr-1">#{tag.label}</Text>
+                                            <TouchableOpacity onPress={() => setTags(tags.filter(t => t.id !== tag.id))}>
                                                 <X size={14} color="#166534" />
                                             </TouchableOpacity>
                                         </View>

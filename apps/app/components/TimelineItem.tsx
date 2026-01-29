@@ -43,7 +43,7 @@ export function TimelineItem({ item }: TimelineItemProps) {
                             <View className="flex-row flex-wrap mt-1 mb-2">
                                 {(item.data as MealRecord).tags.map((tag, idx) => (
                                     <View key={idx} className="bg-gray-100 px-2 py-0.5 rounded-full mr-1 mb-1">
-                                        <Text className="text-xs text-gray-600">#{tag}</Text>
+                                        <Text className="text-xs text-gray-600">#{typeof tag === 'string' ? tag : tag.label}</Text>
                                     </View>
                                 ))}
                                 {(item.data as MealRecord).activeInquiry && (

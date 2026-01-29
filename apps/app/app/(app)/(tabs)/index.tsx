@@ -10,7 +10,7 @@ import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { useMeals, useUpdateMeal } from '../../../hooks/useMeals'; // Added useUpdateMeal
 import { useSymptoms } from '../../../hooks/useSymptoms';
-import { MealRecord, SymptomRecord } from '../../../types';
+import { MealRecord, SymptomRecord, Tag } from '../../../types';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { TimelineItem } from '../../../components/TimelineItem';
@@ -55,12 +55,18 @@ export default function HomeScreen() {
     return meals?.filter(m => m.activeInquiry) || [];
   }, [meals]);
 
-  const handleAnswerInquiry = async (meal: MealRecord, option: { label: string, tags: string[] }) => {
+  const handleAnswerInquiry = async (meal: MealRecord, option: { label: string, tags: Tag[] }) => {
     // Merge tags
     const currentTags = meal.tags || [];
     const newTags = [...currentTags];
     option.tags.forEach(tag => {
-      if (!newTags.includes(tag)) newTags.push(tag);
+      // Check for existence by ID if object, or value if string (legacy)
+      const tagId = typeof tag === 'string' ? tag : tag.id;
+      const exists = newTags.some(t => {
+        const tId = typeof t === 'string' ? t : t.id;
+        return tId === tagId;
+      });
+      if (!exists) newTags.push(tag);
     });
 
     try {

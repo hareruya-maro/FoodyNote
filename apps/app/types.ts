@@ -1,15 +1,17 @@
+export type Tag = { id: string; label: string };
+
 export type MealRecord = {
     id: string;
     imageUri?: string;
     timestamp: string; // ISO string
     title: string; // e.g. "Lunch" or inferred dish name
-    tags: string[]; // Inferred ingredients
+    tags: Tag[]; // Inferred ingredients
     note?: string;
     activeInquiry?: {
         question: string;
         options: {
             label: string;
-            tags: string[];
+            tags: Tag[];
         }[];
     };
 };

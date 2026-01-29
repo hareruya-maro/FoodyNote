@@ -12,7 +12,7 @@ const modelId = 'gemini-3-flash-preview';
 
 interface MealLog {
     dishName: string;
-    ingredients: string[];
+    ingredients: { id: string, label: string }[];
     timestamp: string;
 }
 

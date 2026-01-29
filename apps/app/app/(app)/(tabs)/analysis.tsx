@@ -63,7 +63,7 @@ export default function AnalysisScreen() {
     const candidates = useMemo(() => {
         if (!meals || !symptoms) return [];
 
-        const tagCounts: Record<string, number> = {};
+        const tagCounts: Record<string, { count: number, label: string }> = {};
         let totalSymptomsAnalyzed = 0;
 
         symptoms.forEach(symptom => {
@@ -78,16 +78,27 @@ export default function AnalysisScreen() {
 
             relevantMeals.forEach(meal => {
                 meal.tags.forEach(tag => {
-                    tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                    // Safe handling for potentially mixed runtime types (string vs Tag object)
+                    // We cast to any to perform runtime check because TS expects Tag
+                    const tagAny = tag as any;
+                    const id = (typeof tagAny === 'string' ? tagAny : tagAny.id) as string;
+                    const label = (typeof tagAny === 'string' ? tagAny : tagAny.label) as string;
+
+                    if (!tagCounts[id]) {
+                        tagCounts[id] = { count: 0, label: label };
+                    }
+                    tagCounts[id].count += 1;
+                    // Update label to latest seen (prefer object label over string)
+                    if (tag.label) tagCounts[id].label = tag.label;
                 });
             });
         });
 
-        const results: TriggerCandidate[] = Object.entries(tagCounts).map(([name, count]) => {
-            const rawScore = totalSymptomsAnalyzed > 0 ? (count / totalSymptomsAnalyzed) * 100 : 0;
+        const results: TriggerCandidate[] = Object.entries(tagCounts).map(([id, data]) => {
+            const rawScore = totalSymptomsAnalyzed > 0 ? (data.count / totalSymptomsAnalyzed) * 100 : 0;
             return {
-                name,
-                count,
+                name: data.label, // Use friendly label for display
+                count: data.count,
                 score: Math.round(rawScore)
             };
         });
