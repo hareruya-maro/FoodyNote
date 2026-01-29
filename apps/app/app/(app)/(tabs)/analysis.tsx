@@ -30,24 +30,21 @@ export default function AnalysisScreen() {
 
     const [report, setReport] = useState<AgenticReport | null>(null);
     const [analyzing, setAnalyzing] = useState(false);
-    const [agentStatus, setAgentStatus] = useState<string>("");
+    const [activeAgent, setActiveAgent] = useState<"analyst" | "researcher" | "writer" | "">("");
 
     const runAnalysis = async () => {
         setAnalyzing(true);
-        setAgentStatus("Analyst Agent is scanning your logs...");
+        setActiveAgent("analyst");
 
         try {
             const functions = getFunctions(app);
             const analyzeWeeklyReport = httpsCallable(functions, 'analyzeWeeklyReport');
 
-            // Simulate progression for better UX (Real function call happens in background)
-            // Use a slight delay to let the user see the "Analyst" state
             const minWait = new Promise(resolve => setTimeout(resolve, 2000));
             const callPromise = analyzeWeeklyReport();
 
-            // wait for a bit then change status
-            setTimeout(() => setAgentStatus("Researcher Agent is checking Google Search..."), 2500);
-            setTimeout(() => setAgentStatus("Writer Agent is drafting your report..."), 5000);
+            setTimeout(() => setActiveAgent("researcher"), 2500);
+            setTimeout(() => setActiveAgent("writer"), 5000);
 
             const [response] = await Promise.all([callPromise, minWait]);
 
@@ -56,10 +53,10 @@ export default function AnalysisScreen() {
 
         } catch (error: any) {
             console.error(error);
-            Alert.alert("Analysis Failed", error.message);
+            Alert.alert(t('analysis.analysisFailed'), error.message);
         } finally {
             setAnalyzing(false);
-            setAgentStatus("");
+            setActiveAgent("");
         }
     };
 
@@ -118,17 +115,21 @@ export default function AnalysisScreen() {
                 <View className="mb-8">
                     <View className="flex-row items-center mb-4">
                         <Sparkles color="#009688" size={20} className="mr-2" />
-                        <Text className="text-lg font-bold text-gray-800">AI Weekly Detective</Text>
+                        <Text className="text-lg font-bold text-gray-800">{t('analysis.detectiveTitle')}</Text>
                     </View>
 
                     {analyzing ? (
                         <View className="bg-teal-50 rounded-3xl p-8 items-center justify-center border border-teal-100">
                             <ActivityIndicator size="large" color="#009688" className="mb-4" />
-                            <Text className="text-teal-800 font-medium text-center mb-2">{agentStatus}</Text>
+                            <Text className="text-teal-800 font-medium text-center mb-2">
+                                {activeAgent === "analyst" ? t('analysis.agentStatus.analyst') :
+                                    activeAgent === "researcher" ? t('analysis.agentStatus.researcher') :
+                                        activeAgent === "writer" ? t('analysis.agentStatus.writer') : ""}
+                            </Text>
                             <View className="flex-row gap-4 mt-2">
-                                <Brain size={20} color={agentStatus.includes("Analyst") ? "#009688" : "#ccc"} />
-                                <Search size={20} color={agentStatus.includes("Researcher") ? "#009688" : "#ccc"} />
-                                <PenTool size={20} color={agentStatus.includes("Writer") ? "#009688" : "#ccc"} />
+                                <Brain size={20} color={activeAgent === "analyst" ? "#009688" : "#ccc"} />
+                                <Search size={20} color={activeAgent === "researcher" ? "#009688" : "#ccc"} />
+                                <PenTool size={20} color={activeAgent === "writer" ? "#009688" : "#ccc"} />
                             </View>
                         </View>
                     ) : report ? (
@@ -136,12 +137,12 @@ export default function AnalysisScreen() {
                             <Text className="text-2xl font-serif text-gray-900 mb-4 leading-8">{report.headline}</Text>
 
                             <View className="mb-4">
-                                <Text className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">EVIDENCE</Text>
+                                <Text className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">{t('analysis.evidence')}</Text>
                                 <Text className="text-gray-700 leading-6">{report.evidence}</Text>
                             </View>
 
                             <View className="bg-teal-50 p-4 rounded-xl border-l-4 border-teal-500">
-                                <Text className="text-sm font-bold text-teal-700 uppercase tracking-wider mb-1">PROPOSAL</Text>
+                                <Text className="text-sm font-bold text-teal-700 uppercase tracking-wider mb-1">{t('analysis.proposal')}</Text>
                                 <Text className="text-gray-800 font-medium">{report.proposal}</Text>
                             </View>
 
@@ -149,20 +150,20 @@ export default function AnalysisScreen() {
                                 onPress={runAnalysis}
                                 className="mt-4 self-end flex-row items-center"
                             >
-                                <Text className="text-gray-400 text-sm mr-1">Refresh</Text>
+                                <Text className="text-gray-400 text-sm mr-1">{t('analysis.refresh')}</Text>
                             </TouchableOpacity>
                         </View>
                     ) : (
                         <View className="bg-gradient-to-r from-teal-500 to-teal-600 rounded-3xl p-6 shadow-lg">
-                            <Text className="text-white text-xl font-bold mb-2">Discover Hidden Patterns</Text>
+                            <Text className="text-white text-xl font-bold mb-2">{t('analysis.discoverPatterns')}</Text>
                             <Text className="text-teal-100 mb-4 leading-5">
-                                Let our AI Agents (Analyst, Researcher, and Writer) investigate your logs from the last 3 months.
+                                {t('analysis.discoverDescription')}
                             </Text>
                             <TouchableOpacity
                                 onPress={runAnalysis}
                                 className="bg-white py-3 px-6 rounded-full self-start flex-row items-center"
                             >
-                                <Text className="text-teal-700 font-bold mr-2">Start Investigation</Text>
+                                <Text className="text-teal-700 font-bold mr-2">{t('analysis.startInvestigation')}</Text>
                                 <ArrowRight color="#00796b" size={16} />
                             </TouchableOpacity>
                         </View>

@@ -64,7 +64,20 @@ export default {
         associatedEpisodes: "Associated with {{count}} episodes",
         freq: "freq.",
         noPatterns: "No patterns detected yet.",
-        insight: "Your data suggests that \"{{name}}\" appears frequently before your symptoms. It was found in {{count}} meals prior to episodes."
+        insight: "Your data suggests that \"{{name}}\" appears frequently before your symptoms. It was found in {{count}} meals prior to episodes.",
+        detectiveTitle: "AI Weekly Detective",
+        agentStatus: {
+            analyst: "Analyst Agent is scanning your logs...",
+            researcher: "Researcher Agent is checking Google Search...",
+            writer: "Writer Agent is drafting your report...",
+        },
+        analysisFailed: "Analysis Failed",
+        evidence: "EVIDENCE",
+        proposal: "PROPOSAL",
+        refresh: "Refresh",
+        discoverPatterns: "Discover Hidden Patterns",
+        discoverDescription: "Let our AI Agents (Analyst, Researcher, and Writer) investigate your logs from the last 3 months.",
+        startInvestigation: "Start Investigation",
     },
     doctor: {
         reportTitle: "Foody Note Report",

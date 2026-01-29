@@ -64,7 +64,20 @@ export default {
         associatedEpisodes: "{{count}}件のエピソードに関連",
         freq: "頻度",
         noPatterns: "まだパターンは検出されていません。",
-        insight: "あなたのデータは「{{name}}」が症状の前に頻繁に現れることを示唆しています。エピソード前の{{count}}回の食事で発見されました。"
+        insight: "あなたのデータは「{{name}}」が症状の前に頻繁に現れることを示唆しています。エピソード前の{{count}}回の食事で発見されました。",
+        detectiveTitle: "AI Weekly 探偵",
+        agentStatus: {
+            analyst: "分析エージェントがログをスキャンしています...",
+            researcher: "リサーチエージェントがGoogle検索で調査しています...",
+            writer: "執筆エージェントがレポートを作成しています...",
+        },
+        analysisFailed: "分析失敗",
+        evidence: "根拠",
+        proposal: "提案",
+        refresh: "更新",
+        discoverPatterns: "隠れたパターンを発見する",
+        discoverDescription: "AIエージェント（分析、リサーチ、執筆）が過去3ヶ月間のログを調査します。",
+        startInvestigation: "調査を開始する",
     },
     doctor: {
         reportTitle: "Foody Note レポート",
