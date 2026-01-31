@@ -61,6 +61,7 @@ async function runAnalystAgent(meals: MealLog[], symptoms: SymptomLog[]): Promis
     Look for repeated patterns.
     
     Return a list of top 3 most likely correlations.
+    IMPORTANT: 'confidenceScore' must be a number between 1 (lowest) and 10 (highest). Do not return 0-1 decimals.
     `;
 
     const response = await client.models.generateContent({

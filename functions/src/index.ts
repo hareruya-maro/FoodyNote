@@ -58,8 +58,8 @@ export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSecond
             .get();
 
         const meals = mealsSnapshot.docs.map(doc => ({
-            dishName: doc.data().dishName || "Unknown",
-            ingredients: doc.data().ingredients || [],
+            dishName: doc.data().title || "Unknown",
+            ingredients: doc.data().tags || [],
             timestamp: doc.data().timestamp
         }));
 
@@ -73,7 +73,7 @@ export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSecond
             type: doc.data().type,
             severity: doc.data().severity,
             timestamp: doc.data().timestamp,
-            memo: doc.data().memo
+            memo: doc.data().note
         }));
 
         if (meals.length === 0 && symptoms.length === 0) {
