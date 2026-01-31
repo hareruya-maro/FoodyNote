@@ -1,9 +1,9 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Stethoscope, LogOut, ChevronRight, User, Globe, Check } from 'lucide-react-native';
-import { useSession } from '../../../ctx';
+import { Check, ChevronRight, Globe, LogOut, Stethoscope, User } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSession } from '../../../ctx';
 import { changeLanguage } from '../../../i18n';
 
 export default function SettingsScreen() {
@@ -15,6 +15,10 @@ export default function SettingsScreen() {
 
     const handleLanguageChange = (lang: string) => {
         changeLanguage(lang);
+    };
+
+    const handleSignOut = () => {
+        signOut();
     };
 
     return (
@@ -68,7 +72,7 @@ export default function SettingsScreen() {
                         <Text className="text-gray-700 ml-3 text-base flex-1">{t('settings.profile')}</Text>
                         <ChevronRight size={20} color="#9ca3af" />
                     </TouchableOpacity>
-                    <TouchableOpacity className="p-4 flex-row items-center" onPress={signOut}>
+                    <TouchableOpacity className="p-4 flex-row items-center" onPress={handleSignOut}>
                         <LogOut size={20} color="#ef4444" />
                         <Text className="text-red-500 ml-3 text-base flex-1">{t('settings.signOut')}</Text>
                     </TouchableOpacity>

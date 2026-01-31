@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "54991860683",
+    "project_id": "foody-note",
+    "storage_bucket": "foody-note.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:54991860683:android:a5f19905474ec655ad3c4e",
+        "android_client_info": {
+          "package_name": "com.apps.hal.foodynote"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7HRmavYhJr9HLgo_Lxe-Pjb7B-yN-9e8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

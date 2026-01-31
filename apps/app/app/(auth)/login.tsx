@@ -1,9 +1,10 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { signInAnonymously } from 'firebase/auth';
-import { auth } from '../../firebaseConfig';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { auth } from '../../firebaseConfig';
+import { signInWithGoogle } from '../../services/auth/google';
 
 export default function Login() {
     const [loading, setLoading] = useState(false);
@@ -14,6 +15,16 @@ export default function Login() {
         try {
             await signInAnonymously(auth);
             // Navigation handled by RootLayout onAuthStateChanged
+        } catch (error) {
+            console.error(error);
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        setLoading(true);
+        try {
+            await signInWithGoogle();
         } catch (error) {
             console.error(error);
             setLoading(false);
@@ -31,6 +42,15 @@ export default function Login() {
                     {t('login.subtitle')}
                 </Text>
             </View>
+
+            <TouchableOpacity
+                onPress={handleGoogleSignIn}
+                disabled={loading}
+                className="w-full bg-white border border-gray-200 py-4 rounded-2xl items-center shadow-sm mb-4 active:scale-95 transition-transform flex-row justify-center"
+            >
+                {/* Google Icon could go here */}
+                <Text className="text-gray-700 font-bold text-lg">Sign in with Google</Text>
+            </TouchableOpacity>
 
             <TouchableOpacity
                 onPress={handlePress}

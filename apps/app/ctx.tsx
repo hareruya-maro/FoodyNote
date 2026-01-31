@@ -1,4 +1,5 @@
 import React from 'react';
+import { auth } from './firebaseConfig';
 import { useStorageState } from './hooks/useStorageState';
 
 const AuthContext = React.createContext<{
@@ -30,13 +31,18 @@ export function SessionProvider(props: React.PropsWithChildren) {
     return (
         <AuthContext.Provider
             value={{
-                signIn: () => {
+                signIn: React.useCallback(() => {
                     // Perform sign-in logic here
                     setSession('xxx');
-                },
-                signOut: () => {
-                    setSession(null);
-                },
+                }, []),
+                signOut: React.useCallback(async () => {
+                    try {
+                        await auth.signOut();
+                        setSession(null);
+                    } catch (error) {
+                        console.error('Error signing out: ', error);
+                    }
+                }, []),
                 session,
                 isLoading,
             }}>

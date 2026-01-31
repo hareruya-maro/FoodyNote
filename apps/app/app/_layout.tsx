@@ -1,13 +1,14 @@
-import { Slot, useRouter, useSegments } from 'expo-router';
-import '../i18n';
-import { useEffect, useState } from 'react';
-import { useAtom, useSetAtom } from 'jotai';
-import { userAtom, authInitializedAtom } from '../store/userAtom';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebaseConfig';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Slot, useRouter, useSegments } from 'expo-router';
+import { onAuthStateChanged } from 'firebase/auth';
+import { useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
+import { SessionProvider } from '../ctx';
+import { auth } from '../firebaseConfig';
 import '../global.css';
+import '../i18n';
+import { authInitializedAtom, userAtom } from '../store/userAtom';
 
 const queryClient = new QueryClient();
 
@@ -53,7 +54,9 @@ function RootLayoutNav() {
 export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
-      <RootLayoutNav />
+      <SessionProvider>
+        <RootLayoutNav />
+      </SessionProvider>
     </QueryClientProvider>
   );
 }
