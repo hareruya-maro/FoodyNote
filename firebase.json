@@ -23,6 +23,9 @@
         "rules": "storage.rules"
     },
     "hosting": {
+        "predeploy": [
+            "pnpm --prefix apps/app run export"
+        ],
         "public": "apps/app/dist",
         "ignore": [
             "firebase.json",

@@ -85,6 +85,13 @@ export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSecond
         }
 
         const report = await generateAgenticReport(meals, symptoms);
+
+        // Save report to Firestore
+        await db.collection("users").doc(uid).collection("analysis_reports").add({
+            ...report,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
         return report;
 
     } catch (error) {

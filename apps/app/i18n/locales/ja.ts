@@ -4,6 +4,8 @@ export default {
         settings: "設定",
         japanese: "日本語",
         english: "英語",
+        back: "戻る",
+        error: "エラー",
     },
     settings: {
         title: "設定",
@@ -78,6 +80,10 @@ export default {
         discoverPatterns: "隠れたパターンを発見する",
         discoverDescription: "AIエージェント（分析、リサーチ、執筆）が過去3ヶ月間のログを調査します。",
         startInvestigation: "調査を開始する",
+        history: "分析履歴",
+        noHistory: "分析履歴はまだありません",
+        historyHint: "分析を実行すると、ここにレポートが表示されます",
+        historyFetchFailed: "履歴の取得に失敗しました",
     },
     doctor: {
         reportTitle: "Foody Note レポート",
