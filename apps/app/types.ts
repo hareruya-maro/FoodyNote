@@ -32,3 +32,15 @@ export type UserSession = {
     email: string;
     name?: string;
 } | null;
+
+export type UserProfile = {
+    age_group: string; // "10s", "20s", "30s", "40s", "50s", "60s", "70+"
+    gender: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+    bowel_type: 'diarrhea' | 'constipation' | 'mixed' | 'gas';
+};
+
+export type AnalysisContext = {
+    subjective_factors: string[]; // e.g. ["stress", "sleep_deprivation"]
+    is_irregular_eating: boolean;
+    late_night_meals_count: number;
+};

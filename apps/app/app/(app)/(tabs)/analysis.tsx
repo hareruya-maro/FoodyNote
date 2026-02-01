@@ -7,6 +7,12 @@ import { useTranslation } from 'react-i18next';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { app } from '../../../firebaseConfig'; // Adjust if path is different
 import { Sparkles, ArrowRight, Brain, Search, PenTool } from 'lucide-react-native';
+import { AnalysisContextModal } from '../../../components/AnalysisContextModal';
+import { calculateAutomaticContext } from '../../../utils/analysisUtils';
+import { getUserProfile } from '../../../services/userService';
+import { useAtom } from 'jotai';
+import { userAtom } from '../../../store/userAtom';
+import { AnalysisContext } from '../../../types';
 
 // Configuration
 const ANALYSIS_WINDOW_HOURS = 12;
@@ -24,6 +30,7 @@ type AgenticReport = {
 };
 
 export default function AnalysisScreen() {
+    const [session] = useAtom(userAtom);
     const { data: meals, isLoading: mealsLoading } = useMeals();
     const { data: symptoms, isLoading: symptomsLoading } = useSymptoms();
     const { t } = useTranslation();
@@ -31,17 +38,50 @@ export default function AnalysisScreen() {
     const [report, setReport] = useState<AgenticReport | null>(null);
     const [analyzing, setAnalyzing] = useState(false);
     const [activeAgent, setActiveAgent] = useState<"analyst" | "researcher" | "writer" | "">("");
+    const [modalVisible, setModalVisible] = useState(false);
 
-    const runAnalysis = async () => {
+    const handleStartAnalysis = () => {
+        setModalVisible(true);
+    };
+
+    const runAnalysisWithContext = async (subjectiveFactors: string[]) => {
+        setModalVisible(false);
         setAnalyzing(true);
         setActiveAgent("analyst");
 
         try {
+            // Get user profile
+            const userProfile = session?.uid ? await getUserProfile(session.uid) : null;
+
+            // Calculate auto context
+            // Default period is 3 months back to now
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setMonth(endDate.getMonth() - 3);
+
+            const autoContext = calculateAutomaticContext(meals || [], startDate, endDate);
+
+            const context: AnalysisContext = {
+                subjective_factors: subjectiveFactors,
+                ...autoContext
+            };
+
+            // Prepare period
+            const period = {
+                start: startDate.toISOString(),
+                end: endDate.toISOString()
+            };
+
             const functions = getFunctions(app);
             const analyzeWeeklyReport = httpsCallable(functions, 'analyzeWeeklyReport');
 
             const minWait = new Promise(resolve => setTimeout(resolve, 2000));
-            const callPromise = analyzeWeeklyReport();
+
+            const callPromise = analyzeWeeklyReport({
+                userProfile,
+                context,
+                period
+            });
 
             setTimeout(() => setActiveAgent("researcher"), 2500);
             setTimeout(() => setActiveAgent("writer"), 5000);
@@ -158,7 +198,7 @@ export default function AnalysisScreen() {
                             </View>
 
                             <TouchableOpacity
-                                onPress={runAnalysis}
+                                onPress={handleStartAnalysis}
                                 className="mt-4 self-end flex-row items-center"
                             >
                                 <Text className="text-gray-400 text-sm mr-1">{t('analysis.refresh')}</Text>
@@ -171,7 +211,7 @@ export default function AnalysisScreen() {
                                 {t('analysis.discoverDescription')}
                             </Text>
                             <TouchableOpacity
-                                onPress={runAnalysis}
+                                onPress={handleStartAnalysis}
                                 className="bg-white py-3 px-6 rounded-full self-start flex-row items-center"
                             >
                                 <Text className="text-teal-700 font-bold mr-2">{t('analysis.startInvestigation')}</Text>
@@ -180,6 +220,12 @@ export default function AnalysisScreen() {
                         </View>
                     )}
                 </View>
+
+                <AnalysisContextModal
+                    visible={modalVisible}
+                    onClose={() => setModalVisible(false)}
+                    onAnalyze={runAnalysisWithContext}
+                />
 
                 {/* Quick Stats Section */}
                 <Text className="text-lg font-bold text-gray-800 mb-4">{t('analysis.topCandidates')}</Text>

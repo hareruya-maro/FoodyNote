@@ -121,5 +121,40 @@ export default {
         subtitle: "写真一枚で、あなたの不調の隠れた原因を発見しましょう。",
         startBtn: "同意して開始",
         disclaimer: "続行することで、このアプリが医療機器ではなく、専門的な医療アドバイスの代わりにならないことに同意したものとみなされます。"
+    },
+    profile: {
+        title: "プロフィール設定",
+        age: "年齢",
+        gender: "性別",
+        bowelType: "お腹のタイプ",
+        save: "保存",
+        options: {
+            gender: {
+                male: "男性",
+                female: "女性",
+                other: "その他",
+                prefer_not_to_say: "無回答"
+            },
+            bowel: {
+                diarrhea: "下痢しやすい",
+                constipation: "便秘しやすい",
+                mixed: "混合型（繰り返す）",
+                gas: "ガス・おならが溜まりやすい"
+            }
+        },
+        setupTitle: "プロフィール設定",
+        setupDescription: "分析精度を上げるため、あなたの基本情報を教えてください。"
+    },
+    context: {
+        modalTitle: "今週の生活コンディション",
+        modalDescription: "分析のヒントになります。当てはまるものがあれば選択してください（複数可）",
+        factors: {
+            stress: "😫 ストレスが多かった",
+            sleep: "🛌 睡眠不足気味",
+            fast_eating: "💨 早食いしてしまった",
+            party: "🍺 飲み会・外食続き",
+            medication: "💊 薬を服用中"
+        },
+        analyzeBtn: "この条件で分析する"
     }
 };

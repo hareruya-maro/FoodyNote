@@ -42,13 +42,20 @@ export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSecond
         throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
     }
 
+    const { userProfile, context, period } = request.data;
     const uid = request.auth.uid;
     const db = admin.firestore();
 
-    // Calculate date range (Last 3 months)
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setMonth(endDate.getMonth() - 3);
+    // Calculate date range (Use provided period or default to last 3 months)
+    let endDate = new Date();
+    let startDate = new Date();
+
+    if (period && period.start && period.end) {
+        startDate = new Date(period.start);
+        endDate = new Date(period.end);
+    } else {
+        startDate.setMonth(endDate.getMonth() - 3);
+    }
 
     try {
         // Fetch Meals
@@ -84,7 +91,7 @@ export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSecond
             };
         }
 
-        const report = await generateAgenticReport(meals, symptoms);
+        const report = await generateAgenticReport(meals, symptoms, userProfile, context);
         return report;
 
     } catch (error) {
