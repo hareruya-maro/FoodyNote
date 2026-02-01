@@ -4,6 +4,8 @@ export default {
         settings: "Settings",
         japanese: "Japanese",
         english: "English",
+        back: "Back",
+        error: "Error",
     },
     settings: {
         title: "Settings",
@@ -78,6 +80,10 @@ export default {
         discoverPatterns: "Discover Hidden Patterns",
         discoverDescription: "Let our AI Agents (Analyst, Researcher, and Writer) investigate your logs from the last 3 months.",
         startInvestigation: "Start Investigation",
+        history: "Analysis History",
+        noHistory: "No analysis history yet",
+        historyHint: "Run an analysis to see reports here",
+        historyFetchFailed: "Failed to fetch history",
     },
     doctor: {
         reportTitle: "Foody Note Report",

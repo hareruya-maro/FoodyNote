@@ -9,15 +9,15 @@ import { auth } from '../firebaseConfig';
 import { getUserProfile } from '../services/userService';
 import '../global.css';
 import '../i18n';
-import { authInitializedAtom, userAtom } from '../store/userAtom';
+import { authInitializedAtom, userAtom, userProfileAtom } from '../store/userAtom';
 
 const queryClient = new QueryClient();
 
 function RootLayoutNav() {
   const [session, setSession] = useAtom(userAtom);
   const [initialized, setInitialized] = useAtom(authInitializedAtom);
+  const [userProfile, setUserProfile] = useAtom(userProfileAtom);
   const [profileChecked, setProfileChecked] = useState(false);
-  const [hasProfile, setHasProfile] = useState(false);
 
   const segments = useSegments();
   const router = useRouter();
@@ -30,13 +30,13 @@ function RootLayoutNav() {
       if (user) {
           try {
              const profile = await getUserProfile(user.uid);
-             setHasProfile(!!profile);
+             setUserProfile(profile);
           } catch (e) {
              console.error("Profile check failed", e);
-             setHasProfile(false);
+             setUserProfile(null);
           }
       } else {
-          setHasProfile(false);
+          setUserProfile(null);
       }
       setProfileChecked(true);
       setInitialized(true);
@@ -49,6 +49,7 @@ function RootLayoutNav() {
 
     const inAuthGroup = segments[0] === '(auth)';
     const isOnboarding = segments[0] === 'onboarding';
+    const hasProfile = !!userProfile;
 
     if (!session && !inAuthGroup) {
       router.replace('/(auth)/login');
@@ -61,7 +62,7 @@ function RootLayoutNav() {
             router.replace('/(app)/(tabs)');
         }
     }
-  }, [session, segments, initialized, isMounted, profileChecked, hasProfile]);
+  }, [session, segments, initialized, isMounted, profileChecked, userProfile]);
 
   if (!initialized || !profileChecked) {
     return (

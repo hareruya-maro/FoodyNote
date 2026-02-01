@@ -5,12 +5,13 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getUserProfile, saveUserProfile } from '../../services/userService';
-import { userAtom } from '../../store/userAtom';
+import { userAtom, userProfileAtom } from '../../store/userAtom';
 import { UserProfile } from '../../types';
 import { Check } from 'lucide-react-native';
 
 export default function ProfileScreen() {
     const [session] = useAtom(userAtom);
+    const [_, setUserProfile] = useAtom(userProfileAtom);
     const router = useRouter();
     const { t } = useTranslation();
     const [saving, setSaving] = useState(false);
@@ -41,7 +42,10 @@ export default function ProfileScreen() {
 
         setSaving(true);
         try {
-            await saveUserProfile(session.uid, profile as UserProfile);
+            const completeProfile = profile as UserProfile;
+            await saveUserProfile(session.uid, completeProfile);
+            setUserProfile(completeProfile);
+
             Alert.alert(t('common.settings'), "Saved!");
             router.back();
         } catch (error) {

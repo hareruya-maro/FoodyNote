@@ -5,12 +5,14 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { saveUserProfile } from '../services/userService';
-import { userAtom } from '../store/userAtom';
+import { userAtom, userProfileAtom } from '../store/userAtom';
 import { UserProfile } from '../types';
 import { Check } from 'lucide-react-native';
 
 export default function OnboardingScreen() {
     const [session] = useAtom(userAtom);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_, setUserProfile] = useAtom(userProfileAtom);
     const router = useRouter();
     const { t } = useTranslation();
     const [saving, setSaving] = useState(false);
@@ -26,21 +28,22 @@ export default function OnboardingScreen() {
     const bowelTypes = ["diarrhea", "constipation", "mixed", "gas"];
 
     const handleSave = async () => {
-        console.log("handleSave called");
         if (!session?.uid) {
-            console.log("No session uid");
             return;
         }
         if (!profile.age_group || !profile.gender || !profile.bowel_type) {
-            console.log("Profile incomplete", profile);
             return;
         }
 
         setSaving(true);
         try {
-            console.log("Saving profile...");
-            await saveUserProfile(session.uid, profile as UserProfile);
-            console.log("Profile saved, navigating...");
+            const completeProfile = profile as UserProfile;
+            await saveUserProfile(session.uid, completeProfile);
+
+            // Update global state immediately
+            setUserProfile(completeProfile);
+
+            // Explicitly navigate as well, just in case state update is slow to trigger layout redirect
             router.replace('/(app)/(tabs)');
         } catch (error) {
             console.error("Save failed", error);

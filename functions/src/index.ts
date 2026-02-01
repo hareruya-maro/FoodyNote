@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { generateContent } from "./services/vertexai";
+import { generateAgenticReport } from "./services/agenticAnalysis";
 
 admin.initializeApp();
 
@@ -34,8 +35,6 @@ export const analyzeMealImage = onCall({ region: "us-central1" }, async (request
         );
     }
 });
-// ... existing code ...
-import { generateAgenticReport } from "./services/agenticAnalysis";
 
 export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSeconds: 300 }, async (request) => {
     if (!request.auth) {
@@ -92,6 +91,13 @@ export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSecond
         }
 
         const report = await generateAgenticReport(meals, symptoms, userProfile, context);
+
+        // Save report to Firestore
+        await db.collection("users").doc(uid).collection("analysis_reports").add({
+            ...report,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
         return report;
 
     } catch (error) {

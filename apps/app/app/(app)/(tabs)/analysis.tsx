@@ -6,13 +6,14 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { app } from '../../../firebaseConfig'; // Adjust if path is different
-import { Sparkles, ArrowRight, Brain, Search, PenTool } from 'lucide-react-native';
+import { Sparkles, ArrowRight, Brain, Search, PenTool, History } from 'lucide-react-native';
 import { AnalysisContextModal } from '../../../components/AnalysisContextModal';
 import { calculateAutomaticContext } from '../../../utils/analysisUtils';
 import { getUserProfile } from '../../../services/userService';
 import { useAtom } from 'jotai';
 import { userAtom } from '../../../store/userAtom';
 import { AnalysisContext } from '../../../types';
+import { useRouter } from 'expo-router';
 
 // Configuration
 const ANALYSIS_WINDOW_HOURS = 12;
@@ -30,6 +31,7 @@ type AgenticReport = {
 };
 
 export default function AnalysisScreen() {
+    const router = useRouter();
     const [session] = useAtom(userAtom);
     const { data: meals, isLoading: mealsLoading } = useMeals();
     const { data: symptoms, isLoading: symptomsLoading } = useSymptoms();
@@ -158,6 +160,12 @@ export default function AnalysisScreen() {
         <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
             <View className="px-6 py-4 bg-white border-b border-gray-100 flex-row justify-between items-center">
                 <Text className="text-2xl font-bold text-gray-800">{t('tabs.analysis')}</Text>
+                <TouchableOpacity
+                    onPress={() => router.push('/(app)/analysis-history')}
+                    className="p-2 bg-gray-50 rounded-full"
+                >
+                    <History size={20} color="#4b5563" />
+                </TouchableOpacity>
             </View>
 
             <ScrollView className="flex-1 p-6">
