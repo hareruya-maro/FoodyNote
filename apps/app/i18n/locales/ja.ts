@@ -36,10 +36,12 @@ export default {
         types: {
             pain: "痛み",
             bloated: "膨満感",
-            nausea: "吐き気"
+            nausea: "吐き気",
+            other: "その他"
         },
         severities: {
             mild: "軽度",
+            medium: "中等度",
             moderate: "中等度",
             severe: "重度"
         }

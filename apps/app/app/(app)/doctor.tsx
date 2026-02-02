@@ -5,12 +5,30 @@ import { X } from 'lucide-react-native';
 import { useSymptoms } from '../../hooks/useSymptoms';
 import { useMemo } from 'react';
 import { format } from 'date-fns';
+import { ja, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
 
 export default function DoctorScreen() {
     const router = useRouter();
     const { data: symptoms, isLoading } = useSymptoms();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+
+    const isJapanese = i18n.language === 'ja';
+    const dateLocale = isJapanese ? ja : enUS;
+    const dateFormat = isJapanese ? 'M月d日 HH:mm' : 'MMM dd, HH:mm';
+    const separator = isJapanese ? '、' : ', ';
+    const openParen = isJapanese ? '（' : ' (';
+    const closeParen = isJapanese ? '）' : ')';
+
+    const getSeverityColor = (severity: string) => {
+        switch (severity) {
+            case 'severe': return 'text-red-600 font-bold';
+            case 'moderate':
+            case 'medium': return 'text-orange-600 font-bold';
+            case 'mild': return 'text-green-600';
+            default: return 'text-gray-600';
+        }
+    };
 
     const stats = useMemo(() => {
         if (!symptoms) return { totalSymptoms: 0, avgLagTime: '--' };
@@ -78,12 +96,20 @@ export default function DoctorScreen() {
                         ) : (
                             recentEpisodes.map((s, i) => (
                                 <View key={i} className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                    <Text className="font-bold text-gray-700">
-                                        {format(new Date(s.timestamp), 'MMM dd, HH:mm')}
-                                    </Text>
-                                    <Text className="text-gray-600 mt-1">
-                                        {t('doctor.condition', { type: s.type, severity: s.severity })}
-                                    </Text>
+                                    <View className="flex-row flex-wrap items-center">
+                                        <Text className="text-base text-gray-800">
+                                            <Text className="font-bold text-gray-700">
+                                                {format(new Date(s.timestamp), dateFormat, { locale: dateLocale })}
+                                            </Text>
+                                            {separator}
+                                            {t(`symptoms.types.${s.type}`)}
+                                            {openParen}
+                                            <Text className={getSeverityColor(s.severity)}>
+                                                {t(`symptoms.severities.${s.severity}`)}
+                                            </Text>
+                                            {closeParen}
+                                        </Text>
+                                    </View>
                                     {s.note ? <Text className="text-gray-500 text-xs mt-1">"{s.note}"</Text> : null}
                                 </View>
                             ))

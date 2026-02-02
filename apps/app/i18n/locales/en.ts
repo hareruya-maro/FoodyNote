@@ -36,10 +36,12 @@ export default {
         types: {
             pain: "Pain",
             bloated: "Bloated",
-            nausea: "Nausea"
+            nausea: "Nausea",
+            other: "Other"
         },
         severities: {
             mild: "Mild",
+            medium: "Medium",
             moderate: "Moderate",
             severe: "Severe"
         }
