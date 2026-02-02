@@ -23,6 +23,18 @@ interface SymptomLog {
     memo?: string;
 }
 
+export interface UserProfile {
+    age_group: string;
+    gender: string;
+    bowel_type: 'diarrhea' | 'constipation' | 'mixed' | 'gas';
+}
+
+export interface AnalysisContext {
+    subjective_factors: string[];
+    is_irregular_eating: boolean;
+    late_night_meals_count: number;
+}
+
 interface Correlation {
     triggerCandidate: string;
     symptomType: string;
@@ -47,16 +59,23 @@ export interface AgenticReport {
 // --- Agent Functions ---
 
 // 1. Analyst Agent: Finds patterns in raw data
-async function runAnalystAgent(meals: MealLog[], symptoms: SymptomLog[]): Promise<Correlation[]> {
+async function runAnalystAgent(meals: MealLog[], symptoms: SymptomLog[], userProfile?: UserProfile, context?: AnalysisContext): Promise<Correlation[]> {
     const prompt = `
     You are an expert Medical Data Analyst. Analyze the following meal and symptom logs to find correlations.
     
+    User Profile:
+    ${userProfile ? JSON.stringify(userProfile) : "Unknown"}
+
+    Context (Lifestyle/Environment):
+    ${context ? JSON.stringify(context) : "None"}
+
     Data:
     Meals: ${JSON.stringify(meals)}
     Symptoms: ${JSON.stringify(symptoms)}
 
     Task:
     Identify potential "Trigger Foods" that might be causing symptoms.
+    Consider the user's bowel type and context (e.g. stress, sleep) when analyzing.
     Focus on time lags (e.g., symptoms appearing 1-24 hours after eating).
     Look for repeated patterns.
     
@@ -133,20 +152,27 @@ async function runResearcherAgent(correlations: Correlation[]): Promise<Research
 }
 
 // 3. Writer Agent: Generates the final user-facing report
-async function runWriterAgent(correlations: Correlation[], research: ResearchResult[]): Promise<AgenticReport> {
+async function runWriterAgent(correlations: Correlation[], research: ResearchResult[], userProfile?: UserProfile, context?: AnalysisContext): Promise<AgenticReport> {
     const prompt = `
     You are a friendly and empathetic Health Advisor. Write a weekly report for the user based on the analysis and research.
     
+    User Profile:
+    ${userProfile ? JSON.stringify(userProfile) : "Unknown"}
+
+    Context:
+    ${context ? JSON.stringify(context) : "None"}
+
     Analyst Findings: ${JSON.stringify(correlations)}
     Researcher Findings: ${JSON.stringify(research)}
 
     Task:
     Write a concise report with 3 sections:
     1. Headline: A catchy summary (e.g., "Suspicion of Wheat Sensitivity").
-    2. Evidence: Explain why we think this (based on data and research).
+    2. Evidence: Explain why we think this (based on data, research, and user context).
     3. Proposal: Actionable advice for next week (e.g., "Try gluten-free for 3 days").
 
     Tone: Professional but approachable. Avoid sounding like a definitive medical diagnosis. Use "might", "possible", "suggest".
+    Personalize the advice based on their age, gender, and bowel type if applicable.
     Output Language: Japanese.
     `;
 
@@ -172,12 +198,17 @@ async function runWriterAgent(correlations: Correlation[], research: ResearchRes
 }
 
 // Orchestrator
-export async function generateAgenticReport(meals: any[], symptoms: any[]): Promise<AgenticReport> {
+export async function generateAgenticReport(
+    meals: any[],
+    symptoms: any[],
+    userProfile?: UserProfile,
+    context?: AnalysisContext
+): Promise<AgenticReport> {
     // 0. Pre-process logs (dates are strings or timestamps, ensure consistency)
     // Assuming incoming data is already simple objects
 
     // 1. Analyst
-    const correlations = await runAnalystAgent(meals, symptoms);
+    const correlations = await runAnalystAgent(meals, symptoms, userProfile, context);
 
     // 2. Researcher
     // Filter to only high confidence or top results
@@ -185,7 +216,7 @@ export async function generateAgenticReport(meals: any[], symptoms: any[]): Prom
     const researchResults = await runResearcherAgent(topCorrelations);
 
     // 3. Writer
-    const report = await runWriterAgent(topCorrelations, researchResults);
+    const report = await runWriterAgent(topCorrelations, researchResults, userProfile, context);
 
     return report;
 }

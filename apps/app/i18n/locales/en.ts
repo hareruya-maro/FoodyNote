@@ -127,5 +127,40 @@ export default {
         subtitle: "Discover the hidden causes of your upset stomach with just a photo.",
         startBtn: "Agree & Start",
         disclaimer: "By continuing, you agree that this app is not a medical device and should not replace professional medical advice."
+    },
+    profile: {
+        title: "Profile Settings",
+        age: "Age",
+        gender: "Gender",
+        bowelType: "Bowel Type",
+        save: "Save",
+        options: {
+            gender: {
+                male: "Male",
+                female: "Female",
+                other: "Other",
+                prefer_not_to_say: "Prefer not to say"
+            },
+            bowel: {
+                diarrhea: "Diarrhea-prone",
+                constipation: "Constipation-prone",
+                mixed: "Mixed (Alternating)",
+                gas: "Gas / Bloating"
+            }
+        },
+        setupTitle: "Profile Setup",
+        setupDescription: "To improve analysis accuracy, please tell us a bit about yourself."
+    },
+    context: {
+        modalTitle: "Weekly Lifestyle Condition",
+        modalDescription: "This helps the analysis. Please select all that apply.",
+        factors: {
+            stress: "😫 High Stress",
+            sleep: "🛌 Lack of Sleep",
+            fast_eating: "💨 Ate too fast",
+            party: "🍺 Dining out / Drinking",
+            medication: "💊 Taking Medication"
+        },
+        analyzeBtn: "Analyze with these conditions"
     }
 };

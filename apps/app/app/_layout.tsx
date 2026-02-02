@@ -6,41 +6,65 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { SessionProvider } from '../ctx';
 import { auth } from '../firebaseConfig';
+import { getUserProfile } from '../services/userService';
 import '../global.css';
 import '../i18n';
-import { authInitializedAtom, userAtom } from '../store/userAtom';
+import { authInitializedAtom, userAtom, userProfileAtom } from '../store/userAtom';
 
 const queryClient = new QueryClient();
 
 function RootLayoutNav() {
   const [session, setSession] = useAtom(userAtom);
   const [initialized, setInitialized] = useAtom(authInitializedAtom);
+  const [userProfile, setUserProfile] = useAtom(userProfileAtom);
+  const [profileChecked, setProfileChecked] = useState(false);
+
   const segments = useSegments();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setSession(user);
+      if (user) {
+          try {
+             const profile = await getUserProfile(user.uid);
+             setUserProfile(profile);
+          } catch (e) {
+             console.error("Profile check failed", e);
+             setUserProfile(null);
+          }
+      } else {
+          setUserProfile(null);
+      }
+      setProfileChecked(true);
       setInitialized(true);
     });
     return unsubscribe;
   }, []);
 
   useEffect(() => {
-    if (!initialized || !isMounted) return;
+    if (!initialized || !isMounted || !profileChecked) return;
 
     const inAuthGroup = segments[0] === '(auth)';
+    const isOnboarding = segments[0] === 'onboarding';
+    const hasProfile = !!userProfile;
 
     if (!session && !inAuthGroup) {
       router.replace('/(auth)/login');
-    } else if (session && inAuthGroup) {
-      router.replace('/(app)/(tabs)');
+    } else if (session) {
+        if (!hasProfile) {
+            if (!isOnboarding) {
+                router.replace('/onboarding');
+            }
+        } else if (inAuthGroup || isOnboarding) {
+            router.replace('/(app)/(tabs)');
+        }
     }
-  }, [session, segments, initialized, isMounted]);
+  }, [session, segments, initialized, isMounted, profileChecked, userProfile]);
 
-  if (!initialized) {
+  if (!initialized || !profileChecked) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" color="#009688" />

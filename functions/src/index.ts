@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { generateContent } from "./services/vertexai";
+import { generateAgenticReport } from "./services/agenticAnalysis";
 
 admin.initializeApp();
 
@@ -34,21 +35,26 @@ export const analyzeMealImage = onCall({ region: "us-central1" }, async (request
         );
     }
 });
-// ... existing code ...
-import { generateAgenticReport } from "./services/agenticAnalysis";
 
 export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSeconds: 300 }, async (request) => {
     if (!request.auth) {
         throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
     }
 
+    const { userProfile, context, period } = request.data;
     const uid = request.auth.uid;
     const db = admin.firestore();
 
-    // Calculate date range (Last 3 months)
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setMonth(endDate.getMonth() - 3);
+    // Calculate date range (Use provided period or default to last 3 months)
+    let endDate = new Date();
+    let startDate = new Date();
+
+    if (period && period.start && period.end) {
+        startDate = new Date(period.start);
+        endDate = new Date(period.end);
+    } else {
+        startDate.setMonth(endDate.getMonth() - 3);
+    }
 
     try {
         // Fetch Meals
@@ -84,7 +90,7 @@ export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSecond
             };
         }
 
-        const report = await generateAgenticReport(meals, symptoms);
+        const report = await generateAgenticReport(meals, symptoms, userProfile, context);
 
         // Save report to Firestore
         await db.collection("users").doc(uid).collection("analysis_reports").add({

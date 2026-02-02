@@ -67,7 +67,10 @@ export default function SettingsScreen() {
                 <Text className="text-gray-500 font-bold mb-4 uppercase text-xs tracking-wider">{t('settings.account')}</Text>
 
                 <View className="bg-white rounded-xl shadow-sm mb-6 overflow-hidden">
-                    <TouchableOpacity className="p-4 border-b border-gray-100 flex-row items-center">
+                    <TouchableOpacity
+                        className="p-4 border-b border-gray-100 flex-row items-center"
+                        onPress={() => router.push('/(app)/profile')}
+                    >
                         <User size={20} color="#4b5563" />
                         <Text className="text-gray-700 ml-3 text-base flex-1">{t('settings.profile')}</Text>
                         <ChevronRight size={20} color="#9ca3af" />
