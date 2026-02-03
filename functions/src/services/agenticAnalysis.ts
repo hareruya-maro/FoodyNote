@@ -114,9 +114,7 @@ async function runAnalystAgent(meals: MealLog[], symptoms: SymptomLog[], userPro
 async function runResearcherAgent(correlations: Correlation[]): Promise<ResearchResult[]> {
     if (correlations.length === 0) return [];
 
-    const results: ResearchResult[] = [];
-
-    for (const corr of correlations) {
+    const promises = correlations.map(async (corr) => {
         const prompt = `
         You are a Medical Researcher. Investigate if there is a known link between '${corr.triggerCandidate}' and '${corr.symptomType}'.
         Use Google Search to find scientific mechanisms (e.g., FODMAPs, allergies, digestion speed).
@@ -145,11 +143,13 @@ async function runResearcherAgent(correlations: Correlation[]): Promise<Research
         });
 
         if (response.text) {
-            results.push(JSON.parse(response.text) as ResearchResult);
+            return JSON.parse(response.text) as ResearchResult;
         }
-    }
+        return null;
+    });
 
-    return results;
+    const results = await Promise.all(promises);
+    return results.filter((r): r is ResearchResult => r !== null);
 }
 
 // 3. Writer Agent: Generates the final user-facing report
@@ -260,11 +260,11 @@ export async function generateAgenticReport(
     const topCorrelations = correlations.filter(c => c.confidenceScore >= 5).slice(0, 3);
     const researchResults = await runResearcherAgent(topCorrelations);
 
-    // 3. Writer
-    const writerReport = await runWriterAgent(topCorrelations, researchResults, userProfile, context);
-
-    // 4. Doctor Agent
-    const doctorComment = await runDoctorAgent(topCorrelations, researchResults, userProfile, context);
+    // 3. Writer & 4. Doctor Agent (Parallel Execution)
+    const [writerReport, doctorComment] = await Promise.all([
+        runWriterAgent(topCorrelations, researchResults, userProfile, context),
+        runDoctorAgent(topCorrelations, researchResults, userProfile, context)
+    ]);
 
     return {
         ...writerReport,
