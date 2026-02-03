@@ -247,6 +247,14 @@ export default function MealScreen() {
                                         style={{ padding: 10, borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb', flex: 1, fontSize: 16 }}
                                     />
                                 </View>
+                            ) : Platform.OS === 'ios' ? (
+                                <DateTimePicker
+                                    value={date}
+                                    mode="datetime"
+                                    display="compact"
+                                    onChange={onDateChange}
+                                    locale={i18n.language}
+                                />
                             ) : (
                                 <>
                                     <View className="flex-row gap-3">
