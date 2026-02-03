@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Frown, Meh, AlertCircle, Save, Calendar as CalendarIcon, Clock } from 'lucide-react-native';
 import { useState, useEffect } from 'react';
 import { useAddSymptom, useUpdateSymptom, useSymptoms } from '../../hooks/useSymptoms';
@@ -9,14 +9,13 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 
 export default function SymptomScreen() {
-  const router = useRouter();
   const params = useLocalSearchParams<{ id: string }>();
   const isEditing = !!params.id;
 
   const addSymptom = useAddSymptom();
   const updateSymptom = useUpdateSymptom();
   const { data: symptoms } = useSymptoms();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const [type, setType] = useState<SymptomType>('bloated');
   const [severity, setSeverity] = useState<SeverityLevel>('medium');
@@ -115,6 +114,14 @@ export default function SymptomScreen() {
                 style={{ padding: 10, borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb', flex: 1, fontSize: 16 }}
               />
             </View>
+          ) : Platform.OS === 'ios' ? (
+            <DateTimePicker
+              value={date}
+              mode="datetime"
+              display="compact"
+              onChange={onDateChange}
+              locale={i18n.language}
+            />
           ) : (
             <>
               <View className="flex-row gap-3">
@@ -225,7 +232,7 @@ function SeverityButton({ label, value, current, onSelect }: any) {
   return (
     <TouchableOpacity
       onPress={() => onSelect(value)}
-      className={`flex-1 py-3 items-center rounded-lg ${isSelected ? 'bg-white shadow-sm' : ''}`}
+      className={`flex-1 py-3 items-center rounded-lg ${isSelected ? 'bg-white' : ''}`}
     >
       <Text className={isSelected ? 'text-gray-800 font-bold' : 'text-gray-500 font-medium'}>{label}</Text>
     </TouchableOpacity>

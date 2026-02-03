@@ -43,26 +43,28 @@ export default function Login() {
                 </Text>
             </View>
 
-            <TouchableOpacity
-                onPress={handleGoogleSignIn}
-                disabled={loading}
-                className="w-full bg-white border border-gray-200 py-4 rounded-2xl items-center shadow-sm mb-4 active:scale-95 transition-transform flex-row justify-center"
-            >
-                {/* Google Icon could go here */}
-                <Text className="text-gray-700 font-bold text-lg">Sign in with Google</Text>
-            </TouchableOpacity>
+            <View className="items-center mb-12 w-full p-4">
+                <TouchableOpacity
+                    onPress={handleGoogleSignIn}
+                    disabled={loading}
+                    className="w-full bg-white border border-gray-200 py-4 rounded-2xl items-center shadow-sm m-4 mb-4 active:scale-95 transition-transform flex-row justify-center"
+                >
+                    {/* Google Icon could go here */}
+                    <Text className="text-gray-700 font-bold text-lg">Sign in with Google</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-                onPress={handlePress}
-                disabled={loading}
-                className="w-full bg-primary py-4 rounded-2xl items-center shadow-lg active:scale-95 transition-transform"
-            >
-                {loading ? (
-                    <ActivityIndicator color="white" />
-                ) : (
-                    <Text className="text-white font-bold text-lg">{t('login.startBtn')}</Text>
-                )}
-            </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={handlePress}
+                    disabled={loading}
+                    className="w-full bg-primary py-4 rounded-2xl items-center shadow-lg active:scale-95 transition-transform"
+                >
+                    {loading ? (
+                        <ActivityIndicator color="white" />
+                    ) : (
+                        <Text className="text-white font-bold text-lg">{t('login.startBtn')}</Text>
+                    )}
+                </TouchableOpacity>
+            </View>
 
             <Text className="text-xs text-gray-400 mt-8 text-center px-8 leading-4">
                 {t('login.disclaimer')}

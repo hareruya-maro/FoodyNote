@@ -54,6 +54,7 @@ export interface AgenticReport {
     headline: string;
     evidence: string;
     proposal: string;
+    doctorComment: string;
 }
 
 // --- Agent Functions ---
@@ -152,7 +153,7 @@ async function runResearcherAgent(correlations: Correlation[]): Promise<Research
 }
 
 // 3. Writer Agent: Generates the final user-facing report
-async function runWriterAgent(correlations: Correlation[], research: ResearchResult[], userProfile?: UserProfile, context?: AnalysisContext): Promise<AgenticReport> {
+async function runWriterAgent(correlations: Correlation[], research: ResearchResult[], userProfile?: UserProfile, context?: AnalysisContext): Promise<Omit<AgenticReport, 'doctorComment'>> {
     const prompt = `
     You are a friendly and empathetic Health Advisor. Write a weekly report for the user based on the analysis and research.
     
@@ -194,7 +195,51 @@ async function runWriterAgent(correlations: Correlation[], research: ResearchRes
     });
 
     if (!response.text) throw new Error("Writer agent failed");
-    return JSON.parse(response.text) as AgenticReport;
+    return JSON.parse(response.text) as Omit<AgenticReport, 'doctorComment'>;
+}
+
+// 4. Doctor Agent: Generates a professional summary for medical practitioners
+async function runDoctorAgent(correlations: Correlation[], research: ResearchResult[], userProfile?: UserProfile, context?: AnalysisContext): Promise<string> {
+    const prompt = `
+    You are a Medical AI Assistant designed to support Gastroenterologists.
+    Summarize the analysis results for a doctor to review.
+
+    User Profile:
+    ${userProfile ? JSON.stringify(userProfile) : "Unknown"}
+
+    Context:
+    ${context ? JSON.stringify(context) : "None"}
+
+    Analyst Findings (Correlations): ${JSON.stringify(correlations)}
+    Researcher Findings (Mechanisms): ${JSON.stringify(research)}
+
+    Task:
+    Write a "Medical Summary" for the doctor.
+    - Use professional medical terminology (e.g., mention FODMAPs, specific enzymes, motility issues, IgE/IgG mechanisms if relevant).
+    - Be objective and concise.
+    - Highlight potential areas for clinical investigation (e.g., "Consider breath test for SIBO if bloating persists").
+    - Format as a single paragraph or bullet points.
+    - Output Language: Japanese (Professional Medical Japanese).
+    `;
+
+    const response = await client.models.generateContent({
+        model: modelId,
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        config: {
+            responseMimeType: 'application/json',
+            responseSchema: {
+                type: 'OBJECT',
+                properties: {
+                    doctorComment: { type: 'STRING' }
+                },
+                required: ["doctorComment"]
+            }
+        }
+    });
+
+    if (!response.text) return "分析データなし";
+    const result = JSON.parse(response.text);
+    return result.doctorComment;
 }
 
 // Orchestrator
@@ -216,7 +261,13 @@ export async function generateAgenticReport(
     const researchResults = await runResearcherAgent(topCorrelations);
 
     // 3. Writer
-    const report = await runWriterAgent(topCorrelations, researchResults, userProfile, context);
+    const writerReport = await runWriterAgent(topCorrelations, researchResults, userProfile, context);
 
-    return report;
+    // 4. Doctor Agent
+    const doctorComment = await runDoctorAgent(topCorrelations, researchResults, userProfile, context);
+
+    return {
+        ...writerReport,
+        doctorComment
+    };
 }

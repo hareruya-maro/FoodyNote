@@ -4,3 +4,10 @@ lib
 *.log
 .firebase
 test-assets
+.env
+*.app
+*.ipa
+*.apk
+*.aab
+*.tar.gz
+.DS_Store
