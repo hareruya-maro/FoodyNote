@@ -44,3 +44,11 @@ export type AnalysisContext = {
     is_irregular_eating: boolean;
     late_night_meals_count: number;
 };
+
+export interface AgenticReport {
+    headline: string;
+    evidence: string;
+    proposal: string;
+    doctorComment?: string;
+    createdAt?: any;
+}

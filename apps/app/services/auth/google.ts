@@ -6,7 +6,8 @@ import { auth } from '../../firebaseConfig';
 // Initialize GoogleSignin for Native
 if (Platform.OS !== 'web') {
     GoogleSignin.configure({
-        webClientId: '54991860683-pnd4kpf9u4f4t48t1h796crl2v672h0j.apps.googleusercontent.com', // From Google Cloud Console (Web Client ID)
+        webClientId: '54991860683-ro492f5gcq57jgtoo55hmndt41mcpo53.apps.googleusercontent.com', // From Google Cloud Console (Web Client ID)
+        iosClientId: '54991860683-4jr5hduqbpoof64h79kdqvhg52brbqcj.apps.googleusercontent.com', // From Google Cloud Console (Web Client ID)
     });
 }
 

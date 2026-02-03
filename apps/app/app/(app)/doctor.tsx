@@ -3,13 +3,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { X } from 'lucide-react-native';
 import { useSymptoms } from '../../hooks/useSymptoms';
+import { useLatestAnalysis } from '../../hooks/useLatestAnalysis';
 import { useMemo } from 'react';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 
 export default function DoctorScreen() {
     const router = useRouter();
-    const { data: symptoms, isLoading } = useSymptoms();
+    const { data: symptoms, isLoading: symptomsLoading } = useSymptoms();
+    const { data: analysisReport, isLoading: analysisLoading } = useLatestAnalysis();
     const { t } = useTranslation();
 
     const stats = useMemo(() => {
@@ -22,7 +24,7 @@ export default function DoctorScreen() {
 
     const recentEpisodes = useMemo(() => symptoms ? symptoms.slice(0, 5) : [], [symptoms]);
 
-    if (isLoading) {
+    if (symptomsLoading || analysisLoading) {
         return (
             <View className="flex-1 items-center justify-center bg-white">
                 <ActivityIndicator size="small" color="#009688" />
@@ -67,9 +69,17 @@ export default function DoctorScreen() {
                     </View>
 
                     <Text className="text-lg font-bold text-gray-800 mb-4">{t('doctor.correlatedIngredients')}</Text>
-                    <View className="bg-blue-50 p-4 rounded-xl mb-8">
-                        <Text className="text-blue-800">{t('doctor.referAnalysis')}</Text>
-                    </View>
+                    
+                    {analysisReport?.doctorComment ? (
+                        <View className="bg-blue-50 p-4 rounded-xl mb-8 border border-blue-100">
+                            <Text className="text-blue-900 font-bold mb-2 text-sm uppercase tracking-wider">AI Medical Insight</Text>
+                            <Text className="text-blue-900 leading-6 text-base">{analysisReport.doctorComment}</Text>
+                        </View>
+                    ) : (
+                        <View className="bg-gray-50 p-4 rounded-xl mb-8 border border-gray-200">
+                            <Text className="text-gray-500 italic">{t('doctor.referAnalysis')}</Text>
+                        </View>
+                    )}
 
                     <Text className="text-lg font-bold text-gray-800 mb-4">{t('doctor.recentEpisodes')}</Text>
                     <View className="gap-2">
@@ -84,7 +94,7 @@ export default function DoctorScreen() {
                                     <Text className="text-gray-600 mt-1">
                                         {t('doctor.condition', { type: s.type, severity: s.severity })}
                                     </Text>
-                                    {s.note ? <Text className="text-gray-500 text-xs mt-1">"{s.note}"</Text> : null}
+                                    {s.note ? <Text className="text-gray-500 text-xs mt-1">&quot;{s.note}&quot;</Text> : null}
                                 </View>
                             ))
                         )}
