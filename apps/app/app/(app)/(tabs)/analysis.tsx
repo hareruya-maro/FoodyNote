@@ -75,7 +75,7 @@ export default function AnalysisScreen() {
             };
 
             const functions = getFunctions(app);
-            const analyzeWeeklyReport = httpsCallable(functions, 'analyzeWeeklyReport');
+            const analyzeWeeklyReport = httpsCallable(functions, 'analyzeWeeklyReport', { timeout: 540000 });
 
             const minWait = new Promise(resolve => setTimeout(resolve, 2000));
 
