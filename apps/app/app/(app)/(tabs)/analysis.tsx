@@ -86,8 +86,8 @@ export default function AnalysisScreen() {
                 language: i18n.language === 'ja' ? 'Japanese' : 'English'
             });
 
-            setTimeout(() => setActiveAgent("researcher"), 2500);
-            setTimeout(() => setActiveAgent("writer"), 5000);
+            setTimeout(() => setActiveAgent("researcher"), 5000);
+            setTimeout(() => setActiveAgent("writer"), 10000);
 
             const [response] = await Promise.all([callPromise, minWait]);
 
