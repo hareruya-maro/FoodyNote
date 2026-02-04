@@ -55,7 +55,6 @@ export interface AgenticReport {
     evidence: string;
     proposal: string;
     doctorComment: string;
-    doctorComment: string;
 }
 
 // --- Agent Functions ---
@@ -154,7 +153,7 @@ async function runResearcherAgent(correlations: Correlation[]): Promise<Research
 }
 
 // 3. Writer Agent: Generates the final user-facing report
-async function runWriterAgent(correlations: Correlation[], research: ResearchResult[], userProfile?: UserProfile, context?: AnalysisContext): Promise<Omit<AgenticReport, 'doctorComment'>> {
+async function runWriterAgent(correlations: Correlation[], research: ResearchResult[], language: string = 'Japanese', userProfile?: UserProfile, context?: AnalysisContext): Promise<Omit<AgenticReport, 'doctorComment'>> {
     const prompt = `
     You are a friendly and empathetic Health Advisor. Write a weekly report for the user based on the analysis and research.
     
@@ -175,7 +174,7 @@ async function runWriterAgent(correlations: Correlation[], research: ResearchRes
 
     Tone: Professional but approachable. Avoid sounding like a definitive medical diagnosis. Use "might", "possible", "suggest".
     Personalize the advice based on their age, gender, and bowel type if applicable.
-    Output Language: Japanese.
+    Output Language: ${language}.
     `;
 
     const response = await client.models.generateContent({
@@ -200,7 +199,7 @@ async function runWriterAgent(correlations: Correlation[], research: ResearchRes
 }
 
 // 4. Doctor Agent: Generates a professional summary for medical practitioners
-async function runDoctorAgent(correlations: Correlation[], research: ResearchResult[], userProfile?: UserProfile, context?: AnalysisContext): Promise<string> {
+async function runDoctorAgent(correlations: Correlation[], research: ResearchResult[], language: string = 'Japanese', userProfile?: UserProfile, context?: AnalysisContext): Promise<string> {
     const prompt = `
     You are a Medical AI Assistant designed to support Gastroenterologists.
     Summarize the analysis results for a doctor to review.
@@ -220,7 +219,7 @@ async function runDoctorAgent(correlations: Correlation[], research: ResearchRes
     - Be objective and concise.
     - Highlight potential areas for clinical investigation (e.g., "Consider breath test for SIBO if bloating persists").
     - Format as a single paragraph or bullet points.
-    - Output Language: Japanese (Professional Medical Japanese).
+    - Output Language: ${language} (Professional Medical terminology).
     `;
 
     const response = await client.models.generateContent({
@@ -247,6 +246,7 @@ async function runDoctorAgent(correlations: Correlation[], research: ResearchRes
 export async function generateAgenticReport(
     meals: any[],
     symptoms: any[],
+    language: string = 'Japanese',
     userProfile?: UserProfile,
     context?: AnalysisContext
 ): Promise<AgenticReport> {
@@ -262,10 +262,10 @@ export async function generateAgenticReport(
     const researchResults = await runResearcherAgent(topCorrelations);
 
     // 3. Writer
-    const writerReport = await runWriterAgent(topCorrelations, researchResults, userProfile, context);
+    const writerReport = await runWriterAgent(topCorrelations, researchResults, language, userProfile, context);
 
     // 4. Doctor Agent
-    const doctorComment = await runDoctorAgent(topCorrelations, researchResults, userProfile, context);
+    const doctorComment = await runDoctorAgent(topCorrelations, researchResults, language, userProfile, context);
 
     return {
         ...writerReport,
