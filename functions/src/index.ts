@@ -6,7 +6,7 @@ import { generateAgenticReport } from "./services/agenticAnalysis";
 
 admin.initializeApp();
 
-export const analyzeMealImage = onCall({ region: "us-central1" }, async (request) => {
+export const analyzeMealImage = onCall({ region: "us-central1", timeoutSeconds: 540 }, async (request) => {
     // Check authentication
     if (!request.auth) {
         throw new HttpsError(

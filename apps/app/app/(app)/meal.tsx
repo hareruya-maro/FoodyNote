@@ -94,7 +94,7 @@ export default function MealScreen() {
         setActiveInquiry(null);
 
         try {
-            const analyzeFn = httpsCallable(functions, 'analyzeMealImage');
+            const analyzeFn = httpsCallable(functions, 'analyzeMealImage', { timeout: 540000 });
 
             const response = await analyzeFn({
                 imageBase64: photoBase64,
