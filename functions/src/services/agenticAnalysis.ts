@@ -55,6 +55,7 @@ export interface AgenticReport {
     evidence: string;
     proposal: string;
     doctorComment: string;
+    doctorComment: string;
 }
 
 // --- Agent Functions ---

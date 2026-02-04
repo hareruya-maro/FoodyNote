@@ -1,13 +1,13 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { format } from 'date-fns';
+import { enUS, ja } from 'date-fns/locale';
 import { useRouter } from 'expo-router';
 import { X } from 'lucide-react-native';
-import { useSymptoms } from '../../hooks/useSymptoms';
-import { useLatestAnalysis } from '../../hooks/useLatestAnalysis';
 import { useMemo } from 'react';
-import { format } from 'date-fns';
-import { ja, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLatestAnalysis } from '../../hooks/useLatestAnalysis';
+import { useSymptoms } from '../../hooks/useSymptoms';
 
 export default function DoctorScreen() {
     const router = useRouter();
@@ -120,7 +120,7 @@ export default function DoctorScreen() {
                                             {closeParen}
                                         </Text>
                                     </View>
-                                    {s.note ? <Text className="text-gray-500 text-xs mt-1">"{s.note}"</Text> : null}
+                                    {s.note ? <Text className="text-gray-500 text-xs mt-1">&quot;{s.note}&quot;</Text> : null}
                                 </View>
                             ))
                         )}

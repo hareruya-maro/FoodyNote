@@ -36,7 +36,7 @@ export const analyzeMealImage = onCall({ region: "us-central1" }, async (request
     }
 });
 
-export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSeconds: 300 }, async (request) => {
+export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSeconds: 540 }, async (request) => {
     if (!request.auth) {
         throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
     }
