@@ -1,5 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 import { generateContent } from "./services/vertexai";
 import { generateAgenticReport } from "./services/agenticAnalysis";
 
@@ -95,7 +96,7 @@ export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSecond
         // Save report to Firestore
         await db.collection("users").doc(uid).collection("analysis_reports").add({
             ...report,
-            createdAt: admin.firestore.FieldValue.serverTimestamp()
+            createdAt: FieldValue.serverTimestamp()
         });
 
         return report;
