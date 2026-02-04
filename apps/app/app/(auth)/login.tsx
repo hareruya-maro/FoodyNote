@@ -1,7 +1,7 @@
 import { signInAnonymously } from 'firebase/auth';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth } from '../../firebaseConfig';
 import { signInWithGoogle } from '../../services/auth/google';
@@ -34,9 +34,10 @@ export default function Login() {
     return (
         <SafeAreaView className="flex-1 bg-white items-center justify-center p-6">
             <View className="items-center mb-12">
-                <View className="w-24 h-24 bg-primary rounded-3xl items-center justify-center mb-6 shadow-md transform rotate-3">
-                    <Text className="text-white text-5xl font-bold">Fn</Text>
-                </View>
+                <Image
+                    source={require('../../assets/images/icon.png')}
+                    className="w-24 h-24 rounded-3xl mb-6 transform rotate-3"
+                />
                 <Text className="text-3xl font-extrabold text-gray-900 tracking-tight">Foody Note</Text>
                 <Text className="text-base text-gray-500 mt-3 text-center leading-6 px-4">
                     {t('login.subtitle')}
