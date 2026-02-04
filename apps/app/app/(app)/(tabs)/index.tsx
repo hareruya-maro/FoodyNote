@@ -112,7 +112,7 @@ export default function HomeScreen() {
   const renderSectionHeader = ({ section: { title } }: { section: { title: string } }) => (
     <View className="px-6 py-2 bg-gray-50/90 backdrop-blur-sm">
       <Text className="text-gray-500 font-bold text-sm uppercase tracking-wider">
-        {format(new Date(title), 'MMM d, yyyy')}
+        {new Date(title).toLocaleDateString()}
       </Text>
     </View>
   );
