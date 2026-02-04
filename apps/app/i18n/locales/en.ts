@@ -36,10 +36,12 @@ export default {
         types: {
             pain: "Pain",
             bloated: "Bloated",
-            nausea: "Nausea"
+            nausea: "Nausea",
+            other: "Other"
         },
         severities: {
             mild: "Mild",
+            medium: "Medium",
             moderate: "Moderate",
             severe: "Severe"
         }
@@ -67,7 +69,7 @@ export default {
         freq: "freq.",
         noPatterns: "No patterns detected yet.",
         insight: "Your data suggests that \"{{name}}\" appears frequently before your symptoms. It was found in {{count}} meals prior to episodes.",
-        detectiveTitle: "AI Weekly Detective",
+        detectiveTitle: "AI Detective",
         agentStatus: {
             analyst: "Analyst Agent is scanning your logs...",
             researcher: "Researcher Agent is checking Google Search...",
@@ -98,7 +100,8 @@ export default {
         referAnalysis: "Please refer to the \"Analysis\" tab for the detailed trigger ranking algorithm results.",
         recentEpisodes: "Recent Episodes",
         noEpisodes: "No episodes recorded.",
-        condition: "Condition: {{type}} ({{severity}})"
+        condition: "Condition: {{type}} ({{severity}})",
+        aiMedicalInsight: "AI Medical Insight"
     },
     meal: {
         takePhoto: "Take a photo of your meal",
@@ -152,7 +155,7 @@ export default {
         setupDescription: "To improve analysis accuracy, please tell us a bit about yourself."
     },
     context: {
-        modalTitle: "Weekly Lifestyle Condition",
+        modalTitle: "Lifestyle Condition",
         modalDescription: "This helps the analysis. Please select all that apply.",
         factors: {
             stress: "😫 High Stress",

@@ -36,10 +36,12 @@ export default {
         types: {
             pain: "痛み",
             bloated: "膨満感",
-            nausea: "吐き気"
+            nausea: "吐き気",
+            other: "その他"
         },
         severities: {
             mild: "軽度",
+            medium: "中等度",
             moderate: "中等度",
             severe: "重度"
         }
@@ -67,7 +69,7 @@ export default {
         freq: "頻度",
         noPatterns: "まだパターンは検出されていません。",
         insight: "あなたのデータは「{{name}}」が症状の前に頻繁に現れることを示唆しています。エピソード前の{{count}}回の食事で発見されました。",
-        detectiveTitle: "AI Weekly 探偵",
+        detectiveTitle: "AI 探偵",
         agentStatus: {
             analyst: "分析エージェントがログをスキャンしています...",
             researcher: "リサーチエージェントがGoogle検索で調査しています...",
@@ -98,7 +100,8 @@ export default {
         referAnalysis: "詳細なトリガーランキングアルゴリズムの結果については、「分析」タブを参照してください。",
         recentEpisodes: "最近のエピソード",
         noEpisodes: "記録されたエピソードはありません。",
-        condition: "状態: {{type}} ({{severity}})"
+        condition: "状態: {{type}} ({{severity}})",
+        aiMedicalInsight: "AI医学的見解"
     },
     meal: {
         takePhoto: "食事の写真を撮る",
@@ -152,7 +155,7 @@ export default {
         setupDescription: "分析精度を上げるため、あなたの基本情報を教えてください。"
     },
     context: {
-        modalTitle: "今週の生活コンディション",
+        modalTitle: "生活コンディション",
         modalDescription: "分析のヒントになります。当てはまるものがあれば選択してください（複数可）",
         factors: {
             stress: "😫 ストレスが多かった",

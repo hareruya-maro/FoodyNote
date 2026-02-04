@@ -1,18 +1,36 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { format } from 'date-fns';
+import { enUS, ja } from 'date-fns/locale';
 import { useRouter } from 'expo-router';
 import { X } from 'lucide-react-native';
-import { useSymptoms } from '../../hooks/useSymptoms';
-import { useLatestAnalysis } from '../../hooks/useLatestAnalysis';
 import { useMemo } from 'react';
-import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLatestAnalysis } from '../../hooks/useLatestAnalysis';
+import { useSymptoms } from '../../hooks/useSymptoms';
 
 export default function DoctorScreen() {
     const router = useRouter();
     const { data: symptoms, isLoading: symptomsLoading } = useSymptoms();
     const { data: analysisReport, isLoading: analysisLoading } = useLatestAnalysis();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+
+    const isJapanese = i18n.language === 'ja';
+    const dateLocale = isJapanese ? ja : enUS;
+    const dateFormat = isJapanese ? 'M月d日 HH:mm' : 'MMM dd, HH:mm';
+    const separator = isJapanese ? '、' : ', ';
+    const openParen = isJapanese ? '（' : ' (';
+    const closeParen = isJapanese ? '）' : ')';
+
+    const getSeverityColor = (severity: string) => {
+        switch (severity) {
+            case 'severe': return 'text-red-600 font-bold';
+            case 'moderate':
+            case 'medium': return 'text-orange-600 font-bold';
+            case 'mild': return 'text-green-600';
+            default: return 'text-gray-600';
+        }
+    };
 
     const stats = useMemo(() => {
         if (!symptoms) return { totalSymptoms: 0, avgLagTime: '--' };
@@ -69,10 +87,10 @@ export default function DoctorScreen() {
                     </View>
 
                     <Text className="text-lg font-bold text-gray-800 mb-4">{t('doctor.correlatedIngredients')}</Text>
-                    
+
                     {analysisReport?.doctorComment ? (
                         <View className="bg-blue-50 p-4 rounded-xl mb-8 border border-blue-100">
-                            <Text className="text-blue-900 font-bold mb-2 text-sm uppercase tracking-wider">AI Medical Insight</Text>
+                            <Text className="text-blue-900 font-bold mb-2 text-sm uppercase tracking-wider">{t('doctor.aiMedicalInsight')}</Text>
                             <Text className="text-blue-900 leading-6 text-base">{analysisReport.doctorComment}</Text>
                         </View>
                     ) : (
@@ -88,12 +106,20 @@ export default function DoctorScreen() {
                         ) : (
                             recentEpisodes.map((s, i) => (
                                 <View key={i} className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                    <Text className="font-bold text-gray-700">
-                                        {format(new Date(s.timestamp), 'MMM dd, HH:mm')}
-                                    </Text>
-                                    <Text className="text-gray-600 mt-1">
-                                        {t('doctor.condition', { type: s.type, severity: s.severity })}
-                                    </Text>
+                                    <View className="flex-row flex-wrap items-center">
+                                        <Text className="text-base text-gray-800">
+                                            <Text className="font-bold text-gray-700">
+                                                {format(new Date(s.timestamp), dateFormat, { locale: dateLocale })}
+                                            </Text>
+                                            {separator}
+                                            {t(`symptoms.types.${s.type}`)}
+                                            {openParen}
+                                            <Text className={getSeverityColor(s.severity)}>
+                                                {t(`symptoms.severities.${s.severity}`)}
+                                            </Text>
+                                            {closeParen}
+                                        </Text>
+                                    </View>
                                     {s.note ? <Text className="text-gray-500 text-xs mt-1">&quot;{s.note}&quot;</Text> : null}
                                 </View>
                             ))

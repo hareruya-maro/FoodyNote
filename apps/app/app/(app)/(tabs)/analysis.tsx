@@ -1,19 +1,19 @@
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useMeals } from '../../../hooks/useMeals';
-import { useSymptoms } from '../../../hooks/useSymptoms';
+import { useRouter } from 'expo-router';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { useAtom } from 'jotai';
+import { ArrowRight, Brain, History, PenTool, Search, Sparkles } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import { app } from '../../../firebaseConfig'; // Adjust if path is different
-import { Sparkles, ArrowRight, Brain, Search, PenTool, History } from 'lucide-react-native';
+import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { AnalysisContextModal } from '../../../components/AnalysisContextModal';
-import { calculateAutomaticContext } from '../../../utils/analysisUtils';
+import { app } from '../../../firebaseConfig'; // Adjust if path is different
+import { useMeals } from '../../../hooks/useMeals';
+import { useSymptoms } from '../../../hooks/useSymptoms';
 import { getUserProfile } from '../../../services/userService';
-import { useAtom } from 'jotai';
 import { userAtom } from '../../../store/userAtom';
 import { AnalysisContext } from '../../../types';
-import { useRouter } from 'expo-router';
+import { calculateAutomaticContext } from '../../../utils/analysisUtils';
 
 // Configuration
 const ANALYSIS_WINDOW_HOURS = 12;
@@ -35,7 +35,7 @@ export default function AnalysisScreen() {
     const [session] = useAtom(userAtom);
     const { data: meals, isLoading: mealsLoading } = useMeals();
     const { data: symptoms, isLoading: symptomsLoading } = useSymptoms();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const [report, setReport] = useState<AgenticReport | null>(null);
     const [analyzing, setAnalyzing] = useState(false);
@@ -75,18 +75,19 @@ export default function AnalysisScreen() {
             };
 
             const functions = getFunctions(app);
-            const analyzeWeeklyReport = httpsCallable(functions, 'analyzeWeeklyReport');
+            const analyzeWeeklyReport = httpsCallable(functions, 'analyzeWeeklyReport', { timeout: 540000 });
 
             const minWait = new Promise(resolve => setTimeout(resolve, 2000));
 
             const callPromise = analyzeWeeklyReport({
                 userProfile,
                 context,
-                period
+                period,
+                language: i18n.language === 'ja' ? 'Japanese' : 'English'
             });
 
-            setTimeout(() => setActiveAgent("researcher"), 2500);
-            setTimeout(() => setActiveAgent("writer"), 5000);
+            setTimeout(() => setActiveAgent("researcher"), 5000);
+            setTimeout(() => setActiveAgent("writer"), 10000);
 
             const [response] = await Promise.all([callPromise, minWait]);
 

@@ -1,5 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 import { generateContent } from "./services/vertexai";
 import { generateAgenticReport } from "./services/agenticAnalysis";
 
@@ -36,12 +37,12 @@ export const analyzeMealImage = onCall({ region: "us-central1" }, async (request
     }
 });
 
-export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSeconds: 300 }, async (request) => {
+export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSeconds: 540 }, async (request) => {
     if (!request.auth) {
         throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
     }
 
-    const { userProfile, context, period } = request.data;
+    const { userProfile, context, period, language } = request.data;
     const uid = request.auth.uid;
     const db = admin.firestore();
 
@@ -90,12 +91,12 @@ export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSecond
             };
         }
 
-        const report = await generateAgenticReport(meals, symptoms, userProfile, context);
+        const report = await generateAgenticReport(meals, symptoms, language || "Japanese", userProfile, context);
 
         // Save report to Firestore
         await db.collection("users").doc(uid).collection("analysis_reports").add({
             ...report,
-            createdAt: admin.firestore.FieldValue.serverTimestamp()
+            createdAt: FieldValue.serverTimestamp()
         });
 
         return report;
