@@ -9,11 +9,11 @@ export const getUserProfile = async (uid: string): Promise<UserProfile | null> =
             const data = userDoc.data();
             // Check if essential profile fields exist
             if (data.age_group && data.gender && data.bowel_type) {
-                 return {
+                return {
                     age_group: data.age_group,
                     gender: data.gender,
                     bowel_type: data.bowel_type
-                 } as UserProfile;
+                } as UserProfile;
             }
         }
         return null;
@@ -25,9 +25,7 @@ export const getUserProfile = async (uid: string): Promise<UserProfile | null> =
 
 export const saveUserProfile = async (uid: string, profile: UserProfile): Promise<void> => {
     try {
-        console.log("userService: setDoc start", uid, profile);
         await setDoc(doc(db, 'users', uid), profile, { merge: true });
-        console.log("userService: setDoc success");
     } catch (error) {
         console.error("Error saving user profile:", error);
         throw error;
