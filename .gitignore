@@ -11,3 +11,4 @@ test-assets
 *.aab
 *.tar.gz
 .DS_Store
+data
