@@ -90,7 +90,7 @@ export default function DoctorScreen() {
 
                     {analysisReport?.doctorComment ? (
                         <View className="bg-blue-50 p-4 rounded-xl mb-8 border border-blue-100">
-                            <Text className="text-blue-900 font-bold mb-2 text-sm uppercase tracking-wider">AI Medical Insight</Text>
+                            <Text className="text-blue-900 font-bold mb-2 text-sm uppercase tracking-wider">{t('doctor.aiMedicalInsight')}</Text>
                             <Text className="text-blue-900 leading-6 text-base">{analysisReport.doctorComment}</Text>
                         </View>
                     ) : (
