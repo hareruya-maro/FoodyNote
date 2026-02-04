@@ -36,6 +36,7 @@ export default function Login() {
             <View className="items-center mb-12">
                 <Image
                     source={require('../../assets/images/icon.png')}
+                    style={{ width: 96, height: 96 }}
                     className="w-24 h-24 rounded-3xl mb-6 transform rotate-3"
                 />
                 <Text className="text-3xl font-extrabold text-gray-900 tracking-tight">Foody Note</Text>
