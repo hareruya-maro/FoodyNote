@@ -101,7 +101,8 @@ export default {
         recentEpisodes: "Recent Episodes",
         noEpisodes: "No episodes recorded.",
         condition: "Condition: {{type}} ({{severity}})",
-        aiMedicalInsight: "AI Medical Insight"
+        aiMedicalInsight: "AI Medical Insight",
+        precedingMeal: "Preceding Meal"
     },
     meal: {
         takePhoto: "Take a photo of your meal",

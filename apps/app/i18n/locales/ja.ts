@@ -101,7 +101,8 @@ export default {
         recentEpisodes: "最近のエピソード",
         noEpisodes: "記録されたエピソードはありません。",
         condition: "状態: {{type}} ({{severity}})",
-        aiMedicalInsight: "AI医学的見解"
+        aiMedicalInsight: "AI医学的見解",
+        precedingMeal: "直前の食事"
     },
     meal: {
         takePhoto: "食事の写真を撮る",
