@@ -61,7 +61,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770220512504.jpg?alt=media&token=47bb3cec-88dc-4f5c-a3f8-8fab187630c7",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F3-lungh.jpeg?alt=media&token=913f07bc-dac9-4b77-989f-bfca35366ef9",
                     "timestamp": "2026-02-04T03:34:07.805Z"
                 }
             },
@@ -96,7 +96,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770221362181.jpg?alt=media&token=a42798bd-d432-414b-be63-81b323c00895",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F5-dinner.jpeg?alt=media&token=d1b6ccb0-5c6b-434b-8618-722a9bf5d3cd",
                     "timestamp": "2026-02-06T10:07:18.592Z"
                 }
             },
@@ -131,7 +131,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770220700292.jpg?alt=media&token=a2a73b45-b785-4083-ab0e-dde0eb8a8185",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F4-morning.jpeg?alt=media&token=3b177d0a-5086-4498-95bb-8eb81ff6f913",
                     "timestamp": "2026-02-04T23:02:40.544Z"
                 }
             },
@@ -166,7 +166,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770220839678.jpg?alt=media&token=8b9ced81-c9cf-4288-bd36-24eb92c2693d",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F4-lunch.jpg?alt=media&token=d7ed326f-81ba-41f6-a0ce-caf03e036936",
                     "timestamp": "2026-02-05T03:29:32.546Z"
                 }
             },
@@ -201,7 +201,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770221556648.jpg?alt=media&token=0d31f6ec-c7b4-4057-9fd1-f82312101691",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F6-dinner.jpeg?alt=media&token=58b0925a-fd08-4b3d-b813-8f9bc8d77e96",
                     "timestamp": "2026-02-07T09:11:55.489Z"
                 }
             },
@@ -236,7 +236,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770220139872.jpg?alt=media&token=1e1793df-1c64-4ab1-90cc-ea1effd5ae9a",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F2-lunch.jpeg?alt=media&token=4f26010f-9a54-4d44-bb98-2e1d31dcbb11",
                     "timestamp": "2026-02-03T03:38:08.800Z"
                 }
             },
@@ -255,7 +255,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770220574595.jpg?alt=media&token=65895f8e-638a-4762-a755-3d452ca30202",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F3-teatime.jpeg?alt=media&token=f148823c-c259-4192-bb34-d364c6064222",
                     "timestamp": "2026-02-04T06:02:35.999Z"
                 }
             },
@@ -302,7 +302,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770221207113.jpg?alt=media&token=66e1c935-7371-473c-9037-308e492a9c6e",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F5-lunch.jpeg?alt=media&token=c0a55786-ccdd-43f5-a09a-0d2f61bc7638",
                     "timestamp": "2026-02-06T03:29:31.686Z"
                 }
             },
@@ -337,7 +337,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770221456902.jpg?alt=media&token=87feecdc-94cd-4cd4-a22d-0a3096e47ad9",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F6-blunch.jpeg?alt=media&token=a8c6d708-7984-493e-9afe-41749b228706",
                     "timestamp": "2026-02-07T01:09:28.556Z"
                 }
             },
@@ -360,7 +360,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770219444741.jpg?alt=media&token=48030310-aace-44b5-a36c-40c0d832fef6",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F2-morning.jpeg?alt=media&token=bd337ceb-18e9-420e-8a50-7f4221dc9974",
                     "timestamp": "2026-02-02T23:10:44.282Z"
                 }
             },
@@ -391,7 +391,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770220385825.jpg?alt=media&token=642d1de5-95e1-4891-90e6-d47971f3e2c2",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F3-morning.jpeg?alt=media&token=2f8a362c-475d-43f4-8bd2-40dc638eb56f",
                     "timestamp": "2026-02-03T22:52:28.129Z"
                 }
             },
@@ -442,7 +442,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770219326092.jpg?alt=media&token=430dce57-1575-48a1-9256-4815ae3c5f32",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F1-dinner.jpeg?alt=media&token=395d5360-8794-4a3a-b0e7-8bbae9229438",
                     "timestamp": "2026-02-02T10:15:00.604Z"
                 }
             },
@@ -473,7 +473,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770221009196.jpg?alt=media&token=3d3aea2f-4b35-4a1e-bc8b-50e019113799",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F5-morning.jpeg?alt=media&token=c4eabe25-7a97-4032-891b-8ffbd13008bc",
                     "timestamp": "2026-02-05T23:02:02.069Z"
                 }
             },
@@ -520,7 +520,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770220919669.jpg?alt=media&token=f88dea18-0314-4ef1-8c60-00602f45f6c9",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F4-dinner.jpeg?alt=media&token=8a320970-9266-488d-a005-72c8a136078c",
                     "timestamp": "2026-02-05T10:00:42.649Z"
                 }
             },
@@ -563,7 +563,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770218574301.jpg?alt=media&token=a702c659-32bb-4703-967b-3ad4e4f8fc60",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F1-lunch.jpeg?alt=media&token=a9e0b9aa-7a93-4f38-9ba2-7ca53e4f84f3",
                     "timestamp": "2026-02-02T03:23:53.395Z"
                 }
             },
@@ -606,7 +606,7 @@ export const demoData = {
                         }
                     ],
                     "activeInquiry": null,
-                    "imageUri": "http://localhost:9199/v0/b/foody-note.firebasestorage.app/o/users%2F5THCZzQiDcerZN6OfHhkZTIfaB7d%2Fmeals%2F1770220342756.jpg?alt=media&token=99e07357-6f49-4858-a01c-d1fee352eb93",
+                    "imageUri": "https://firebasestorage.googleapis.com/v0/b/foody-note.firebasestorage.app/o/demo-assets%2F2-dinner.jpeg?alt=media&token=81ec28b4-5f38-4103-9fa1-5f16b3c4631e",
                     "timestamp": "2026-02-03T10:44:15.468Z"
                 }
             }
