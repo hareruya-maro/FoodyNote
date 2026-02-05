@@ -43,8 +43,9 @@ export function AnalysisVisuals({ meals, symptoms }: Props) {
 
         // 2. Map Symptoms to Preceding Meals (24h window)
         const tagStats: Record<string, { label: string; totalAttempts: number; triggerCount: number }> = {};
+        const totalSymptoms = filteredSymptoms.length;
 
-        // Initialize with all existing tags from all meals to get "totalAttempts"
+        // A. Count total attempts per tag (How many times each food was eaten)
         meals.forEach(meal => {
             meal.tags.forEach(tag => {
                 if (!tagStats[tag.id]) {
@@ -54,10 +55,9 @@ export function AnalysisVisuals({ meals, symptoms }: Props) {
             });
         });
 
-        // Count triggers
+        // B. Count prevalence in symptoms (How many symptoms were preceded by each food)
         filteredSymptoms.forEach(symptom => {
             const symptomTime = new Date(symptom.timestamp).getTime();
-            // Look back 24 hours (24 * 60 * 60 * 1000 = 86400000 ms)
             const lookbackWindow = 24 * 60 * 60 * 1000;
 
             const relevantMeals = meals.filter(m => {
@@ -65,7 +65,7 @@ export function AnalysisVisuals({ meals, symptoms }: Props) {
                 return mealTime < symptomTime && mealTime > (symptomTime - lookbackWindow);
             });
 
-            // Collect unique tags in this window to avoid double counting for same symptom (e.g. ate wheat twice before pain)
+            // Collect unique tags in this window to avoid double counting for same symptom
             const uniqueTagsInWindow = new Set<string>();
             relevantMeals.forEach(m => {
                 m.tags.forEach(t => uniqueTagsInWindow.add(t.id));
@@ -78,16 +78,17 @@ export function AnalysisVisuals({ meals, symptoms }: Props) {
             });
         });
 
-        // 3. Format & Calculate Risk
+        // 3. Format & Calculate Correlation %
+        // Definition: Out of all upset events (filtered), what % were preceded by this tag?
         const results: AnalysisItem[] = Object.entries(tagStats)
             .map(([id, stats]) => ({
                 id,
                 label: stats.label,
                 count: stats.totalAttempts,
-                risk: stats.totalAttempts > 0 ? Math.round((stats.triggerCount / stats.totalAttempts) * 100) : 0
+                // Formula: (Count of symptoms preceded by this tag / Total count of symptoms) * 100
+                risk: totalSymptoms > 0 ? Math.round((stats.triggerCount / totalSymptoms) * 100) : 0
             }))
-            // Filter noise: must have been eaten at least 3 times total, and at least 1 trigger
-            // For demo purposes with small data, we might lower this threshold
+            // Filter noise: must have been eaten at least 2 times total, and at least 1 trigger
             .filter(item => item.count >= 2 && item.risk > 0)
             .sort((a, b) => b.risk - a.risk);
 
