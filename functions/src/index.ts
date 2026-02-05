@@ -106,3 +106,6 @@ export const analyzeWeeklyReport = onCall({ region: "us-central1", timeoutSecond
         throw new HttpsError("internal", "Analysis failed", error);
     }
 });
+
+export * from "./triggers/setupDemoData";
+

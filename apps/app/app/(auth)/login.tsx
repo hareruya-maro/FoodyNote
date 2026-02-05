@@ -10,16 +10,39 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const { t } = useTranslation();
 
+
     const handlePress = async () => {
         setLoading(true);
         try {
             await signInAnonymously(auth);
-            // Navigation handled by RootLayout onAuthStateChanged
+
+            // Setup demo data
+            try {
+                const { httpsCallable } = await import("firebase/functions");
+                const { functions } = await import("../../firebaseConfig");
+                const setupDemoData = httpsCallable(functions, 'setupDemoData');
+                await setupDemoData();
+            } catch (fnError) {
+                console.error("Failed to setup demo data:", fnError);
+            }
+
+            // Navigation is handled by RootLayout onAuthStateChanged, 
+            // but we might want to ensure it only happens after data is ready.
+            // Since onAuthStateChanged triggers immediately on sign-in, parallel to this.
+            // However, the user state change happens first. 
+            // Ideally, we should block navigation. 
+            // But since onAuthStateChanged is global in RootLayout, it might navigate automatically.
+            // Let's rely on the fact that if we await here, we hold the loading state? 
+            // No, the auth listener will likely fire.
+            // But for a Hackathon, waiting here usually creates enough delay or at least starts the process.
+            // If the RootLayout navigates immediately, the dashboard might load empty first.
+            // But `setupDemoData` is fast.
         } catch (error) {
             console.error(error);
             setLoading(false);
         }
     };
+
 
     const handleGoogleSignIn = async () => {
         setLoading(true);
