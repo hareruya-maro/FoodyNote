@@ -16,7 +16,7 @@ export type MealRecord = {
     };
 };
 
-export type SymptomType = 'bloated' | 'pain' | 'nausea' | 'other';
+export type SymptomType = 'bloated' | 'pain' | 'nausea' | 'diarrhea' | 'tired' | 'other';
 export type SeverityLevel = 'mild' | 'medium' | 'severe';
 
 export type SymptomRecord = {

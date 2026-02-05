@@ -4,7 +4,7 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "dev:firebase": "firebase emulators:start",
+    "dev:firebase": "firebase emulators:start --import data --export-on-exit data",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },

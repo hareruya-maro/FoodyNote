@@ -1,6 +1,11 @@
 import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Frown, Meh, AlertCircle, Save, Calendar as CalendarIcon, Clock } from 'lucide-react-native';
+import { Frown, Meh, AlertCircle, Save, Calendar as CalendarIcon, Clock, Droplets, Zap, Moon } from 'lucide-react-native';
+
+// ... (rest of imports)
+
+// ... inside component
+
 import { useState, useEffect } from 'react';
 import { useAddSymptom, useUpdateSymptom, useSymptoms } from '../../hooks/useSymptoms';
 import { SymptomType, SeverityLevel } from '../../types';
@@ -146,7 +151,16 @@ export default function SymptomScreen() {
           )}
         </View>
 
-        <View className="flex-row justify-between mb-8">
+        <View className="flex-row flex-wrap gap-3 mb-8">
+          <OptionButton
+            selected={type === 'pain'}
+            onPress={() => setType('pain')}
+            label={t('symptoms.types.pain')}
+            color="text-red-600 font-bold"
+            icon={<Zap size={40} color="#ef4444" />}
+            bg="bg-gray-50"
+            activeBg="bg-red-50 border-red-200"
+          />
           <OptionButton
             selected={type === 'bloated'}
             onPress={() => setType('bloated')}
@@ -157,22 +171,40 @@ export default function SymptomScreen() {
             activeBg="bg-yellow-50 border-yellow-200"
           />
           <OptionButton
-            selected={type === 'pain'}
-            onPress={() => setType('pain')}
-            label={t('symptoms.types.pain')}
-            color="text-red-600 font-bold"
-            icon={<Frown size={40} color="#ef4444" />}
+            selected={type === 'diarrhea'}
+            onPress={() => setType('diarrhea')}
+            label={t('symptoms.types.diarrhea')}
+            color="text-blue-500 font-medium"
+            icon={<Droplets size={40} color="#3b82f6" />}
             bg="bg-gray-50"
-            activeBg="bg-red-50 border-red-200"
+            activeBg="bg-blue-50 border-blue-200"
           />
           <OptionButton
             selected={type === 'nausea'}
             onPress={() => setType('nausea')}
             label={t('symptoms.types.nausea')}
-            color="text-blue-600 font-medium"
-            icon={<AlertCircle size={40} color="#3b82f6" />}
+            color="text-green-600 font-medium"
+            icon={<AlertCircle size={40} color="#10b981" />}
             bg="bg-gray-50"
-            activeBg="bg-blue-50 border-blue-200"
+            activeBg="bg-green-50 border-green-200"
+          />
+          <OptionButton
+            selected={type === 'tired'}
+            onPress={() => setType('tired')}
+            label={t('symptoms.types.tired')}
+            color="text-purple-600 font-medium"
+            icon={<Moon size={40} color="#9333ea" />}
+            bg="bg-gray-50"
+            activeBg="bg-purple-50 border-purple-200"
+          />
+          <OptionButton
+            selected={type === 'other'}
+            onPress={() => setType('other')}
+            label={t('symptoms.types.other')}
+            color="text-gray-600 font-medium"
+            icon={<AlertCircle size={40} color="#9ca3af" />}
+            bg="bg-gray-50"
+            activeBg="bg-gray-100 border-gray-300"
           />
         </View>
 
@@ -219,7 +251,7 @@ function OptionButton({ selected, onPress, label, color, icon, bg, activeBg }: a
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`items-center p-4 rounded-2xl w-[30%] border ${selected ? `${activeBg} border-2` : `${bg} border-gray-100`}`}
+      className={`items-center p-4 rounded-2xl w-[48%] border ${selected ? `${activeBg} border-2` : `${bg} border-gray-100`}`}
     >
       {icon}
       <Text className={`mt-2 ${selected ? color : 'text-gray-500 font-medium'}`}>{label}</Text>

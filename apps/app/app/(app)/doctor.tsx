@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { enUS, ja } from 'date-fns/locale';
 import { useRouter } from 'expo-router';
-import { X } from 'lucide-react-native';
+import { User, X, Check, ArrowRight } from 'lucide-react-native';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
@@ -90,21 +90,28 @@ export default function DoctorScreen() {
                             </View>
                         </View>
 
-                        <Text className="text-lg font-bold text-gray-800 mb-4">{t('doctor.correlatedIngredients')}</Text>
-
-                        {analysisReport?.doctorComment ? (
-                            <View className="bg-blue-50 p-4 rounded-xl mb-8 border border-blue-100">
-                                <Text className="text-blue-900 font-bold mb-2 text-sm uppercase tracking-wider">{t('doctor.aiMedicalInsight')}</Text>
-                                <Text className="text-blue-900 leading-6 text-base">{analysisReport.doctorComment}</Text>
+                        {analysisReport ? (
+                            <View className="bg-indigo-50 p-6 rounded-xl border border-indigo-100 mb-6">
+                                <View className="flex-row items-center mb-4">
+                                    <View className="bg-indigo-100 p-2 rounded-full mr-3">
+                                        <User size={20} color="#4F46E5" />
+                                    </View>
+                                    <Text className="text-lg font-bold text-indigo-900">{t('doctor.aiMedicalInsight', 'AI Medical Insight')}</Text>
+                                </View>
+                                <Text className="text-gray-800 font-medium mb-4 leading-relaxed">
+                                    {analysisReport.doctorComment || analysisReport.headline}
+                                </Text>
+                                {analysisReport.proposal && (
+                                    <View className="bg-white p-4 rounded-lg border border-indigo-100">
+                                        <Text className="font-bold text-indigo-800 mb-2">{t('doctor.proposal', 'Proposal')}</Text>
+                                        <Text className="text-gray-600">{analysisReport.proposal}</Text>
+                                    </View>
+                                )}
                             </View>
-                        ) : (
-                            <View className="bg-gray-50 p-4 rounded-xl mb-8 border border-gray-200">
-                                <Text className="text-gray-500 italic">{t('doctor.referAnalysis')}</Text>
-                            </View>
-                        )}
+                        ) : null}
 
                         <Text className="text-lg font-bold text-gray-800 mb-4">{t('doctor.recentEpisodes')}</Text>
-                        <View className="gap-2">
+                        <View className="gap-2 pb-10">
                             {recentEpisodes.length === 0 ? (
                                 <Text className="text-gray-400">{t('doctor.noEpisodes')}</Text>
                             ) : (

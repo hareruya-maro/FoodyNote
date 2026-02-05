@@ -37,6 +37,8 @@ export default {
             pain: "痛み",
             bloated: "膨満感",
             nausea: "吐き気",
+            diarrhea: "下痢",
+            tired: "疲労感",
             other: "その他"
         },
         severities: {
@@ -60,15 +62,19 @@ export default {
     analysis: {
         title: "分析",
         triggerFound: "トリガーの可能性あり",
-        noData: {
-            title: "データが不足しています",
-            description: "パターンを見つけるために食事と症状を記録し続けてください。"
-        },
+        noData: "現在の履歴に基づく相関データは見つかりませんでした。",
         topCandidates: "トリガー候補",
-        associatedEpisodes: "{{count}}件のエピソードに関連",
-        freq: "頻度",
-        noPatterns: "まだパターンは検出されていません。",
-        insight: "あなたのデータは「{{name}}」が症状の前に頻繁に現れることを示唆しています。エピソード前の{{count}}回の食事で発見されました。",
+        allRiskFactors: "全体のリスク要因",
+        filteredRiskFactors: "{{type}}のリスク要因",
+        axisRisk: "危険度",
+        axisFreq: "頻度",
+        highRiskZone: "要対策エリア",
+        tabRanking: "トリガー順位",
+        tabMap: "リスクマップ",
+        filterBySymptom: "不調の種類で絞り込み:",
+        noDataTitle: "データが不足しています",
+        noDataDesc: "パターンを見つけるために食事と症状を記録し続けてください。",
+        insight: "あなたのデータは...",
         detectiveTitle: "AI 探偵",
         agentStatus: {
             analyst: "分析エージェントがログをスキャンしています...",
@@ -80,12 +86,12 @@ export default {
         proposal: "提案",
         refresh: "更新",
         discoverPatterns: "隠れたパターンを発見する",
-        discoverDescription: "AIエージェント（分析、リサーチ、執筆）が過去3ヶ月間のログを調査します。",
+        discoverDescription: "AIエージェントが調査します...",
         startInvestigation: "調査を開始する",
         history: "分析履歴",
         noHistory: "分析履歴はまだありません",
-        historyHint: "分析を実行すると、ここにレポートが表示されます",
-        historyFetchFailed: "履歴の取得に失敗しました",
+        historyHint: "分析を実行すると表示されます",
+        historyFetchFailed: "履歴の取得に失敗しました"
     },
     doctor: {
         reportTitle: "Foody Note レポート",
@@ -102,7 +108,13 @@ export default {
         noEpisodes: "記録されたエピソードはありません。",
         condition: "状態: {{type}} ({{severity}})",
         aiMedicalInsight: "AI医学的見解",
-        precedingMeal: "直前の食事"
+        precedingMeal: "直前の食事",
+        defaultHeadline: "分析完了",
+        proposal: "改善提案",
+        hideDetails: "詳細な考察を隠す",
+        showDetails: "詳細な考察を見る",
+        detailedAnalysis: "詳細な分析",
+        evidence: "根拠"
     },
     meal: {
         takePhoto: "食事の写真を撮る",
