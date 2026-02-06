@@ -189,7 +189,7 @@ export default function AnalysisScreen() {
                             </TouchableOpacity>
                         </View>
                     ) : (
-                        <View className="bg-gradient-to-r from-teal-500 to-teal-600 rounded-3xl p-6 shadow-lg">
+                        <View className="bg-gradient-to-r from-teal-500 to-teal-600 bg-teal-500 rounded-3xl p-6 shadow-lg">
                             <Text className="text-white text-xl font-bold mb-2">{t('analysis.discoverPatterns')}</Text>
                             <Text className="text-teal-100 mb-4 leading-5">
                                 {t('analysis.discoverDescription')}
