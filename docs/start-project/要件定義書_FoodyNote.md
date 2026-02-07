@@ -95,7 +95,7 @@
 
 ### **4.3 AI / API**
 
-* **Image Analysis:** Google Gemini API (Gemini 1.5 Pro / Flash)  
+* **Image Analysis:** Google Gemini API (Gemini 3 Pro / Flash)  
   * 食材タグの自動生成に使用。
 
 ## **5\. データモデル設計（簡易版）**

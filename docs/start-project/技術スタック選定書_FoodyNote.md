@@ -24,7 +24,7 @@
 
 ### **4\. AI / LLM連携 (AI Integration)**
 
-* **Model:** **Google Gemini 1.5 Flash** (または Pro)  
+* **Model:** **Google Gemini 3 Flash** (または Pro)  
 * **Library:** **Google Generative AI SDK**  
   * 画像解析・成分タグ生成に使用。
 
