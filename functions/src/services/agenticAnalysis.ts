@@ -6,7 +6,8 @@ const client = new GoogleGenAI({
     location: 'global'
 });
 
-const modelId = 'gemini-3-pro-preview';
+const modelIdFlash = 'gemini-3-flash-latest';
+const modelIdPro = 'gemini-3-pro-preview';
 
 // --- Data Models ---
 
@@ -85,7 +86,7 @@ async function runAnalystAgent(meals: MealLog[], symptoms: SymptomLog[], userPro
     `;
 
     const response = await client.models.generateContent({
-        model: modelId,
+        model: modelIdPro,
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         config: {
             responseMimeType: 'application/json',
@@ -123,7 +124,7 @@ async function runResearcherAgent(correlations: Correlation[]): Promise<Research
         `;
 
         const response = await client.models.generateContent({
-            model: modelId,
+            model: modelIdPro,
             contents: [{ role: 'user', parts: [{ text: prompt }] }],
             // @ts-ignore: tools is supported but types might be outdated
             tools: [{ googleSearch: {} }],
@@ -178,7 +179,7 @@ async function runWriterAgent(correlations: Correlation[], research: ResearchRes
     `;
 
     const response = await client.models.generateContent({
-        model: modelId,
+        model: modelIdFlash,
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         config: {
             responseMimeType: 'application/json',
@@ -223,7 +224,7 @@ async function runDoctorAgent(correlations: Correlation[], research: ResearchRes
     `;
 
     const response = await client.models.generateContent({
-        model: modelId,
+        model: modelIdPro,
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         config: {
             responseMimeType: 'application/json',
