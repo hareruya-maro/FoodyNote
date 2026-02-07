@@ -6,7 +6,7 @@ const client = new GoogleGenAI({
     location: 'global'
 });
 
-const modelId = 'gemini-3-flash-preview';
+const modelId = 'gemini-3-pro-preview';
 
 // --- Data Models ---
 
